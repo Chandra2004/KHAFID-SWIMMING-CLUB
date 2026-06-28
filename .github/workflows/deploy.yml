@@ -1,0 +1,109 @@
+name: Deploy to CPanel/Shared Hosting
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  web-deploy:
+    name: 🎉 Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🚚 Get latest code
+        uses: actions/checkout@v4
+
+      - name: ⚡ Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          extensions: mbstring, intl, pdo, pdo_mysql, gd, zip
+          coverage: none
+
+      - name: 📦 Install PHP Dependencies
+        run: composer install --no-dev --optimize-autoloader --prefer-dist --no-interaction --no-progress
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: 🛠️ Install NPM Dependencies and Build Assets
+        run: |
+          npm ci || npm install
+          npm run build
+
+      - name: 🎨 Publish Package Assets (Webartisan)
+        run: |
+          php artisan vendor:publish --tag=webartisan-assets --force --no-interaction
+
+      - name: 📁 Prepare Storage & Cleanup Garbage
+        run: |
+          # Create required storage structure
+          mkdir -p storage/framework/{sessions,views,cache}
+          mkdir -p storage/logs
+          mkdir -p storage/app/uploads/{profiles,ktp_documents,akta_documents,kk_documents}
+          touch storage/framework/sessions/.gitkeep
+          touch storage/framework/views/.gitkeep
+          touch storage/framework/cache/.gitkeep
+          touch storage/logs/.gitkeep
+          touch storage/app/uploads/profiles/.gitkeep
+          touch storage/app/uploads/ktp_documents/.gitkeep
+          touch storage/app/uploads/akta_documents/.gitkeep
+          touch storage/app/uploads/kk_documents/.gitkeep
+
+          # REMOVE GARBAGE (To speed up deployment)
+          rm -rf docker
+          rm -rf stubs
+          rm -f sail
+          # Remove thousands of unnecessary icons from public
+          rm -rf public/vendor/blade-lucide-icons
+          
+          # CLEAR CACHE FILES (Ensures fresh config on server)
+          rm -f bootstrap/cache/*.php
+
+      - name: 🔐 Create .env file
+        env:
+          ENV_PROD_EXTRAS: ${{ secrets.ENV_PROD_EXTRAS }}
+        run: |
+          # Use printf to ensure $ characters and spaces are preserved correctly in .env
+          printf '%s\n' "$ENV_PROD_EXTRAS" >> .env
+
+      - name: Sync files to InfinityFree
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: khafidswimmingclub.com/htdocs/
+          timeout: 3600000
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/.github/**
+            **/.idx/**
+            **/.BACKUP/**
+            **/.cursorrules
+            **/.dockerignore
+            **/docker/**
+            **/Dockerfile
+            **/tests/**
+            **/node_modules/**
+            **/docs/**
+            **/phpunit.xml
+            **/.env.example
+            **/README.md
+            **/CHANGELOG.md
+            **/CODE_OF_CONDUCT.md
+            **/CONTRIBUTING.md
+            **/SECURITY.md
+            **/UPGRADE.md
+            **/LICENSE
+            storage/logs/**
+            storage/framework/views/**
+            storage/framework/cache/**
+            storage/app/**
+            !storage/**/
