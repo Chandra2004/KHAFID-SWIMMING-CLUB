@@ -20,11 +20,11 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             RequirementParameterSeeder::class,
             // NotificationSeeder::class,
-            ClubSeeder::class,
-            FinanceAccountSeeder::class,
-            CategorySeeder::class,
-            EventSeeder::class,
-            EventCategorySeeder::class,
+            // ClubSeeder::class,
+            // FinanceAccountSeeder::class,
+            // CategorySeeder::class,
+            // EventSeeder::class,
+            // EventCategorySeeder::class,
             // RegistrationSeeder::class,
         ]);
     }
