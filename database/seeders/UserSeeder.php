@@ -76,44 +76,44 @@ class UserSeeder extends Seeder
         $this->createProfile($athlete, 'Atlet Utama KSC', 'male', $club->uid, '2015-06-15');
 
         // 5. Create Sample Athletes (Birth year 2015)
-        $clubs = \App\Models\Club::all();
-        if ($clubs->isEmpty()) {
-            $clubs = collect([$club]);
-        }
-        for ($i = 1; $i <= 20; $i++) {
-            $gender = $i % 2 == 0 ? 'female' : 'male';
-            $sampleAthlete = User::updateOrCreate(
-                ['email' => 'atlet' . $i . '@example.com'],
-                [
-                    'username' => 'atlet_' . $i,
-                    'password' => Hash::make('password123'),
-                    'is_active' => true,
-                ]
-            );
-            $sampleAthlete->assignRole('atlet');
+        // $clubs = \App\Models\Club::all();
+        // if ($clubs->isEmpty()) {
+        //     $clubs = collect([$club]);
+        // }
+        // for ($i = 1; $i <= 20; $i++) {
+        //     $gender = $i % 2 == 0 ? 'female' : 'male';
+        //     $sampleAthlete = User::updateOrCreate(
+        //         ['email' => 'atlet' . $i . '@example.com'],
+        //         [
+        //             'username' => 'atlet_' . $i,
+        //             'password' => Hash::make('password123'),
+        //             'is_active' => true,
+        //         ]
+        //     );
+        //     $sampleAthlete->assignRole('atlet');
 
-            DataUser::updateOrCreate(
-                ['user_uid' => $sampleAthlete->uid],
-                [
-                    'uid' => (string) \Illuminate\Support\Str::uuid(),
-                    'full_name' => ($gender === 'female' ? 'Siti ' : 'Rafi ') . 'Athlete ' . $i,
-                    'nickname' => 'atlet' . $i,
-                    'gender' => $gender,
-                    'birth_place' => 'Sidoarjo',
-                    'birth_date' => '2015-08-12',
-                    'phone_number' => '0812345678' . $i,
-                    'backup_phone_number' => '0898765432' . $i,
-                    'address' => 'Jl. Pahlawan No. ' . $i . ', Sidoarjo',
-                    'height' => 145 + $i,
-                    'weight' => 38 + $i,
-                    'identity_number' => '35150000000000' . sprintf('%02d', $i),
-                    'medical_history' => 'Sehat Walafiat',
-                    'club_uid' => $clubs->random()->uid,
-                    'is_active' => true,
-                    'joined_at' => now(),
-                ]
-            );
-        }
+        //     DataUser::updateOrCreate(
+        //         ['user_uid' => $sampleAthlete->uid],
+        //         [
+        //             'uid' => (string) \Illuminate\Support\Str::uuid(),
+        //             'full_name' => ($gender === 'female' ? 'Siti ' : 'Rafi ') . 'Athlete ' . $i,
+        //             'nickname' => 'atlet' . $i,
+        //             'gender' => $gender,
+        //             'birth_place' => 'Sidoarjo',
+        //             'birth_date' => '2015-08-12',
+        //             'phone_number' => '0812345678' . $i,
+        //             'backup_phone_number' => '0898765432' . $i,
+        //             'address' => 'Jl. Pahlawan No. ' . $i . ', Sidoarjo',
+        //             'height' => 145 + $i,
+        //             'weight' => 38 + $i,
+        //             'identity_number' => '35150000000000' . sprintf('%02d', $i),
+        //             'medical_history' => 'Sehat Walafiat',
+        //             'club_uid' => $clubs->random()->uid,
+        //             'is_active' => true,
+        //             'joined_at' => now(),
+        //         ]
+        //     );
+        // }
     }
 
     /**
