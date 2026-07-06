@@ -425,7 +425,43 @@ new class extends Component {
                 </div>
 
                 <div class="overflow-y-auto flex-1 p-8 custom-scrollbar">
-                    <form wire:submit.prevent="save" id="galleryForm">
+                    <form x-data @submit.prevent="
+                        let promises = [];
+                        
+                        // Upload cover image jika ada
+                        let ci = document.getElementById('mg_cover_image')?.files[0];
+                        if (ci) promises.push(new Promise((resolve, reject) => { @this.upload('cover_image', ci, resolve, reject); }));
+                        
+                        // Upload multiple photos jika ada
+                        const photosInput = document.getElementById('mg_photos');
+                        if (photosInput && photosInput.files.length > 0) {
+                            const filesArr = Array.from(photosInput.files);
+                            filesArr.forEach(file => {
+                                promises.push(new Promise((resolve, reject) => { @this.upload('photos[]', file, resolve, reject); }));
+                            });
+                        }
+                        
+                        const btn = document.getElementById('mgSubmitBtn');
+                        const txtEl = document.getElementById('mgSubmitText');
+                        const loadEl = document.getElementById('mgSubmitLoading');
+                        
+                        if (promises.length > 0) {
+                            btn.disabled = true;
+                            txtEl.classList.add('hidden');
+                            loadEl.classList.remove('hidden');
+                            Promise.all(promises).then(() => {
+                                @this.call('save');
+                                setTimeout(() => { btn.disabled = false; txtEl.classList.remove('hidden'); loadEl.classList.add('hidden'); }, 2000);
+                            }).catch(() => {
+                                alert('Gagal mengunggah file. Silakan coba lagi.');
+                                btn.disabled = false;
+                                txtEl.classList.remove('hidden');
+                                loadEl.classList.add('hidden');
+                            });
+                        } else {
+                            @this.call('save');
+                        }
+                    " id="galleryForm">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                             {{-- Info Section --}}
                             <div class="space-y-6">
@@ -476,29 +512,24 @@ new class extends Component {
 
                             {{-- Media Section --}}
                             <div class="space-y-8">
-                                {{-- Cover Upload --}}
+                                 {{-- Cover Upload --}}
                                 <div>
                                     <label
                                         class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-4 ml-1 text-center">Album
                                         Cover</label>
                                     <div class="flex flex-col items-center gap-4">
-                                        <div
-                                            class="w-full h-40 bg-slate-50 rounded-[2rem] overflow-hidden border-4 border-white shadow-xl flex items-center justify-center">
-                                            @if ($cover_image)
-                                                <img src="{{ $cover_image->temporaryUrl() }}"
-                                                    class="w-full h-full object-cover">
-                                            @elseif($existingCover)
-                                                <img src="{{ asset($existingCover) }}"
-                                                    class="w-full h-full object-cover">
-                                            @else
+                                        <div wire:ignore
+                                            class="w-full h-40 bg-slate-50 rounded-[2rem] overflow-hidden border-4 border-white shadow-xl flex items-center justify-center relative">
+                                            <img id="preview_mg_cover" src="{{ $existingCover ? asset($existingCover) : '' }}" class="w-full h-full object-cover {{ $existingCover ? '' : 'hidden' }}">
+                                            <div id="placeholder_mg_cover" class="flex items-center justify-center w-full h-full {{ $existingCover ? 'hidden' : '' }}">
                                                 <x-lucide-image class="w-10 h-10 text-slate-300" />
-                                            @endif
+                                            </div>
                                         </div>
                                         <label
                                             class="bg-slate-900 text-white px-6 py-3 rounded-2xl cursor-pointer hover:bg-slate-800 transition font-bold text-[10px] uppercase tracking-[0.2em]">
                                             Ganti Sampul
-                                            <input type="file" wire:model="cover_image" class="hidden"
-                                                accept="image/*" onchange="if(this.files[0] && this.files[0].size > 5242880){ alert('Ukuran file terlalu besar! Maksimal 5MB. Tolong kompres ukuran file Anda terlebih dahulu.'); this.value=''; return false; }">
+                                            <input type="file" id="mg_cover_image" class="hidden"
+                                                accept="image/*" onchange="previewSingleImage(this, 'preview_mg_cover', 'placeholder_mg_cover')">
                                         </label>
                                     </div>
                                 </div>
@@ -508,33 +539,28 @@ new class extends Component {
                                     <div class="flex justify-between items-center mb-4 px-1">
                                         <div>
                                             <label class="block text-xs font-black text-slate-400 uppercase tracking-widest">
-                                                Koleksi Foto 
-                                                @if(count($photos) > 0)
-                                                    <span class="text-indigo-600 ml-1">({{ count($photos) }} Terpilih)</span>
-                                                @endif
+                                                Koleksi Foto
+                                                <span id="mgPhotosCount" class="text-indigo-600 ml-1 hidden"></span>
                                             </label>
                                             <p class="text-[9px] font-bold text-slate-300 uppercase mt-1">Maksimal 50 foto per upload</p>
                                         </div>
                                         <label
                                             class="text-indigo-600 font-black text-[10px] uppercase tracking-widest cursor-pointer hover:underline">
                                             + Tambah Foto
-                                            <input type="file" wire:model="photos" class="hidden"
-                                                accept="image/*" multiple onchange="if(this.files[0] && this.files[0].size > 5242880){ alert('Ukuran file terlalu besar! Maksimal 5MB. Tolong kompres ukuran file Anda terlebih dahulu.'); this.value=''; return false; }">
+                                            <input type="file" id="mg_photos" class="hidden"
+                                                accept="image/*" multiple onchange="
+                                                    previewMultipleImages(this, 'mg_photos_preview');
+                                                    const count = this.files.length;
+                                                    const countEl = document.getElementById('mgPhotosCount');
+                                                    if (count > 0) { countEl.textContent = '(' + count + ' Terpilih)'; countEl.classList.remove('hidden'); }
+                                                    else { countEl.classList.add('hidden'); }
+                                                ">
                                         </label>
                                     </div>
 
                                     {{-- Masonry / Grid Display --}}
                                     <div
                                         class="bg-slate-50 p-4 rounded-[2rem] min-h-[200px] max-h-[400px] overflow-y-auto relative custom-scrollbar border border-slate-100">
-                                        
-                                        {{-- Global Loading Overlay (Fixed Centering) --}}
-                                        <div wire:loading wire:target="photos"
-                                            class="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-20 flex flex-col items-center justify-center rounded-[2rem]">
-                                            <div class="sticky top-1/2 -translate-y-1/2 flex flex-col items-center">
-                                                <div class="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mb-2"></div>
-                                                <p class="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Mengunggah...</p>
-                                            </div>
-                                        </div>
 
                                         <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                                             @foreach ($existingPhotos as $index => $photo)
@@ -548,25 +574,13 @@ new class extends Component {
                                                     </button>
                                                 </div>
                                             @endforeach
-
-                                            @if (!empty($photos))
-                                                @foreach ($photos as $index => $photo)
-                                                    @if ($photo && method_exists($photo, 'temporaryUrl'))
-                                                        <div class="relative group aspect-square rounded-xl overflow-hidden border-2 border-indigo-200">
-                                                            <img src="{{ $photo->temporaryUrl() }}"
-                                                                class="w-full h-full object-cover opacity-80 group-hover:opacity-60 transition">
-                                                            <button type="button" wire:click="removeNewPhoto({{ $index }})"
-                                                                class="absolute inset-0 bg-rose-500/80 text-white opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-                                                                <x-lucide-trash-2 class="w-5 h-5" />
-                                                            </button>
-                                                        </div>
-                                                    @endif
-                                                @endforeach
-                                            @endif
                                         </div>
 
-                                        @if (empty($existingPhotos) && empty($photos))
-                                            <div
+                                        {{-- JS Preview Container for new photos --}}
+                                        <div id="mg_photos_preview" class="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-3 hidden"></div>
+
+                                        @if (empty($existingPhotos))
+                                            <div id="mgNoPhotos"
                                                 class="flex flex-col items-center justify-center py-12 text-slate-300">
                                                 <x-lucide-images class="w-10 h-10 mb-2 opacity-30" />
                                                 <p class="text-[10px] font-bold uppercase tracking-widest text-center">
@@ -585,12 +599,12 @@ new class extends Component {
                 <div class="p-8 border-t border-slate-50 flex items-center gap-4 bg-slate-50/30">
                     <button type="button" wire:click="$set('showModal', false)"
                         class="flex-1 px-6 py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold hover:bg-slate-200 transition uppercase text-[10px] tracking-widest">Batal</button>
-                    <button type="submit" form="galleryForm" wire:loading.attr="disabled" wire:target="save"
-                        class="flex-1 px-6 py-4 bg-indigo-600 text-white rounded-2xl font-bold hover:bg-indigo-700 transition shadow-xl shadow-indigo-100 flex items-center justify-center gap-2 uppercase text-[10px] tracking-widest">
-                        <span wire:loading.remove wire:target="save">
+                    <button type="submit" form="galleryForm" id="mgSubmitBtn"
+                        class="flex-1 px-6 py-4 bg-indigo-600 text-white rounded-2xl font-bold hover:bg-indigo-700 transition shadow-xl shadow-indigo-100 flex items-center justify-center gap-2 uppercase text-[10px] tracking-widest disabled:opacity-70 disabled:cursor-not-allowed">
+                        <span id="mgSubmitText">
                             {{ $modalMode === 'create' ? 'Simpan Album' : 'Perbarui Album' }}
                         </span>
-                        <span wire:loading wire:target="save" class="flex items-center gap-2">
+                        <span id="mgSubmitLoading" class="hidden flex items-center gap-2">
                             <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>

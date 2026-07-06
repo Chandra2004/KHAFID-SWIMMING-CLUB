@@ -341,14 +341,83 @@
                                                                     {{ $userPreview->email }}</p>
                                                             </div>
                                                         </div>
-                                                        <div class="grid grid-cols-2 gap-4 mt-4">
-                                                            <div>
-                                                                <label class="block text-[9px] font-black text-slate-400 uppercase tracking-widest">Klub</label>
-                                                                <p class="text-xs font-bold text-slate-800 uppercase">{{ $userPreview->profile?->club?->name ?: 'INDEPENDENT' }}</p>
+                                                        <div class="space-y-4 mt-4">
+                                                            <div class="grid grid-cols-2 gap-4">
+                                                                <div>
+                                                                    <label class="block text-[9px] font-black text-slate-400 uppercase tracking-widest">Tempat, Tgl Lahir</label>
+                                                                    <p class="text-xs font-bold text-slate-800">
+                                                                        {{ $userPreview->profile?->birth_place ?: '-' }},
+                                                                        {{ $userPreview->profile?->birth_date ? \Carbon\Carbon::parse($userPreview->profile->birth_date)->format('d M Y') : '-' }}
+                                                                    </p>
+                                                                </div>
+                                                                <div>
+                                                                    <label class="block text-[9px] font-black text-slate-400 uppercase tracking-widest">Jenis Kelamin</label>
+                                                                    <p class="text-xs font-bold text-slate-800 uppercase">{{ $userPreview->profile?->gender ?: '-' }}</p>
+                                                                </div>
+                                                            </div>
+                                                            <div class="grid grid-cols-2 gap-4">
+                                                                <div>
+                                                                    <label class="block text-[9px] font-black text-slate-400 uppercase tracking-widest">No. Telp / WA</label>
+                                                                    <p class="text-xs font-bold text-slate-800">{{ $userPreview->profile?->phone_number ?: '-' }}</p>
+                                                                </div>
+                                                                <div>
+                                                                    <label class="block text-[9px] font-black text-slate-400 uppercase tracking-widest">Klub Renang</label>
+                                                                    <p class="text-xs font-bold text-slate-800 uppercase">{{ $userPreview->profile?->club?->name ?: 'INDEPENDENT' }}</p>
+                                                                </div>
+                                                            </div>
+                                                            <div class="grid grid-cols-2 gap-4">
+                                                                <div>
+                                                                    <label class="block text-[9px] font-black text-slate-400 uppercase tracking-widest">NIK / No. Identitas</label>
+                                                                    <p class="text-xs font-bold text-slate-800">{{ $userPreview->profile?->identity_number ?: '-' }}</p>
+                                                                </div>
+                                                                <div>
+                                                                    <label class="block text-[9px] font-black text-slate-400 uppercase tracking-widest">Tinggi & Berat Badan</label>
+                                                                    <p class="text-xs font-bold text-slate-800">{{ $userPreview->profile?->height ? $userPreview->profile->height . ' cm' : '-' }} / {{ $userPreview->profile?->weight ? $userPreview->profile->weight . ' kg' : '-' }}</p>
+                                                                </div>
                                                             </div>
                                                             <div>
-                                                                <label class="block text-[9px] font-black text-slate-400 uppercase tracking-widest">Gender</label>
-                                                                <p class="text-xs font-bold text-slate-800 uppercase">{{ $userPreview->profile?->gender ?: '-' }}</p>
+                                                                <label class="block text-[9px] font-black text-slate-400 uppercase tracking-widest">Alamat Lengkap</label>
+                                                                <p class="text-xs font-bold text-slate-800">{{ $userPreview->profile?->address ?: '-' }}</p>
+                                                            </div>
+                                                            @if($userPreview->profile?->medical_history)
+                                                                <div>
+                                                                    <label class="block text-[9px] font-black text-rose-400 uppercase tracking-widest">Riwayat Medis</label>
+                                                                    <p class="text-xs font-bold text-rose-600">{{ $userPreview->profile->medical_history }}</p>
+                                                                </div>
+                                                            @endif
+                                                            <div class="grid grid-cols-2 gap-4 pt-3 border-t border-blue-100/50">
+                                                                <div>
+                                                                    <label class="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Foto KTP / Identitas</label>
+                                                                    @if ($userPreview->profile?->identity_photo)
+                                                                        <a href="{{ route('document.view', ['type' => 'ktp', 'filename' => basename($userPreview->profile->identity_photo) ?: 'none']) }}"
+                                                                            target="_blank"
+                                                                            class="block w-full h-16 bg-white rounded-xl overflow-hidden border border-blue-100 hover:border-blue-400 transition relative group">
+                                                                            <img src="{{ route('document.view', ['type' => 'ktp', 'filename' => basename($userPreview->profile->identity_photo) ?: 'none']) }}"
+                                                                                class="w-full h-full object-cover">
+                                                                            <div class="absolute inset-0 bg-slate-900/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                                                                                <x-lucide-external-link class="w-4 h-4 text-white" />
+                                                                            </div>
+                                                                        </a>
+                                                                    @else
+                                                                        <div class="w-full h-16 bg-white border border-dashed border-blue-200 rounded-xl flex items-center justify-center text-slate-400 text-[10px] font-bold">Belum Ada</div>
+                                                                    @endif
+                                                                </div>
+                                                                <div>
+                                                                    <label class="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Foto Akta Kelahiran</label>
+                                                                    @if ($userPreview->profile?->birth_certificate_photo)
+                                                                        <a href="{{ route('document.view', ['type' => 'akta', 'filename' => basename($userPreview->profile->birth_certificate_photo) ?: 'none']) }}"
+                                                                            target="_blank"
+                                                                            class="block w-full h-16 bg-white rounded-xl overflow-hidden border border-blue-100 hover:border-blue-400 transition relative group">
+                                                                            <img src="{{ route('document.view', ['type' => 'akta', 'filename' => basename($userPreview->profile->birth_certificate_photo) ?: 'none']) }}"
+                                                                                class="w-full h-full object-cover">
+                                                                            <div class="absolute inset-0 bg-slate-900/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                                                                                <x-lucide-external-link class="w-4 h-4 text-white" />
+                                                                            </div>
+                                                                        </a>
+                                                                    @else
+                                                                        <div class="w-full h-16 bg-white border border-dashed border-blue-200 rounded-xl flex items-center justify-center text-slate-400 text-[10px] font-bold">Belum Ada</div>
+                                                                    @endif
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -599,24 +668,22 @@
                                                     <label
                                                         class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Unggah Bukti Transfer</label>
                                                     <div class="relative group cursor-pointer">
-                                                        <input type="file" wire:model="create_payment_proof"
+                                                        <input type="file" id="payment_proof_input"
                                                             accept="image/*"
-                                                            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" required onchange="if(this.files[0] && this.files[0].size > 5242880){ alert('Ukuran file terlalu besar! Maksimal 5MB. Tolong kompres ukuran file Anda terlebih dahulu.'); this.value=''; return false; }">
-                                                        <div
-                                                            class="w-full h-32 bg-white border-2 border-dashed {{ $create_payment_proof ? 'border-blue-400 bg-blue-50/50' : 'border-slate-200 group-hover:border-blue-400 group-hover:bg-blue-50/30' }} rounded-2xl flex flex-col items-center justify-center transition-all relative z-10 overflow-hidden">
-                                                            @if ($create_payment_proof)
-                                                                <img src="{{ $create_payment_proof->temporaryUrl() }}"
-                                                                    class="absolute inset-0 w-full h-full object-cover opacity-30">
-                                                                <x-lucide-check-circle
-                                                                    class="w-8 h-8 text-blue-600 mb-2 relative z-10" />
-                                                                <span
-                                                                    class="text-xs font-black text-blue-700 uppercase tracking-widest relative z-10">Bukti Terunggah</span>
-                                                            @else
+                                                            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" required onchange="previewSingleImage(this, 'preview-payment-proof', 'placeholder-payment-proof')">
+                                                        
+                                                        <!-- Tambahkan wire:ignore agar DOM tidak di-reset oleh Livewire saat re-render -->
+                                                        <div wire:ignore
+                                                            class="w-full h-32 bg-white border-2 border-dashed border-slate-200 group-hover:border-blue-400 group-hover:bg-blue-50/30 rounded-2xl flex flex-col items-center justify-center transition-all relative z-10 overflow-hidden">
+                                                            
+                                                            <img id="preview-payment-proof" src="" class="absolute inset-0 w-full h-full object-cover opacity-75 hidden">
+                                                            
+                                                            <div id="placeholder-payment-proof" class="flex flex-col items-center justify-center pointer-events-none z-10">
                                                                 <x-lucide-camera
                                                                     class="w-8 h-8 text-slate-300 group-hover:text-blue-400 transition-colors mb-2" />
                                                                 <span
                                                                     class="text-[10px] font-black text-slate-400 group-hover:text-blue-500 uppercase tracking-widest transition-colors">Pilih Foto Bukti</span>
-                                                            @endif
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -637,14 +704,32 @@
                 <div class="p-8 border-t border-slate-50 flex justify-end gap-3 bg-slate-50/30">
                     <button wire:click="closeCreateModal"
                         class="px-8 py-3.5 bg-white text-slate-600 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-slate-200 hover:bg-slate-50 transition shadow-sm">Batal</button>
-                    <button wire:click="saveManualRegistration"
+                    <button type="button" x-data x-on:click="
+                            let method = @this.get('create_payment_method');
+                            let fileInput = document.getElementById('payment_proof_input');
+                            
+                            if (method === 'transfer') {
+                                if (!fileInput || !fileInput.files[0]) {
+                                    alert('Peringatan: Harap pilih foto bukti transfer terlebih dahulu.');
+                                    return;
+                                }
+                                let file = fileInput.files[0];
+                                @this.upload('create_payment_proof', file, (uploadedFilename) => {
+                                    @this.call('saveManualRegistration');
+                                }, () => {
+                                    alert('Gagal mengupload bukti pembayaran.');
+                                });
+                            } else {
+                                @this.call('saveManualRegistration');
+                            }
+                        "
                         wire:loading.attr="disabled"
-                        wire:target="saveManualRegistration"
+                        wire:target="saveManualRegistration, create_payment_proof"
                         class="px-8 py-3.5 bg-ksc-blue text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-blue-100 hover:bg-blue-700 transition transform hover:-translate-y-1 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2">
-                        <span wire:loading.remove wire:target="saveManualRegistration">Simpan Pendaftaran</span>
-                        <span wire:loading wire:target="saveManualRegistration" class="flex items-center gap-2">
+                        <span wire:loading.remove wire:target="saveManualRegistration, create_payment_proof">Simpan Pendaftaran</span>
+                        <span wire:loading wire:target="saveManualRegistration, create_payment_proof" class="flex items-center gap-2">
                             <x-lucide-loader-2 class="w-4 h-4 animate-spin" />
-                            Menyimpan...
+                            Memproses...
                         </span>
                     </button>
                 </div>

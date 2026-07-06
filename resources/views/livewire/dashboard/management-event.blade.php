@@ -533,27 +533,25 @@ new class extends Component {
                                     <div class="md:col-span-2">
                                         <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Logo Event (Kiri & Kanan)</label>
                                         <div class="grid grid-cols-2 gap-4">
-                                            <div class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue">
-                                                @if($logo_left)
-                                                    <img src="{{ $logo_left->temporaryUrl() }}" class="w-full h-full object-cover">
-                                                @elseif($existingLogoLeft)
-                                                    <img src="{{ asset($existingLogoLeft) }}" class="w-full h-full object-cover">
-                                                @else
+                                            <div wire:ignore class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue">
+                                                <div class="absolute inset-0 w-full h-full z-0 pointer-events-none">
+                                                    <img id="preview_me_logo_left" src="{{ $existingLogoLeft ? asset($existingLogoLeft) : '' }}" class="w-full h-full object-cover {{ $existingLogoLeft ? '' : 'hidden' }}">
+                                                </div>
+                                                <div id="placeholder_me_logo_left" class="text-center relative z-10 pointer-events-none {{ $existingLogoLeft ? 'hidden' : '' }}">
                                                     <x-lucide-award class="w-6 h-6 text-slate-300 group-hover:text-ksc-blue transition mb-2" />
                                                     <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest group-hover:text-ksc-blue transition">Logo Kiri</span>
-                                                @endif
-                                                <input type="file" wire:model="logo_left" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="if(this.files[0] && this.files[0].size > 5242880){ alert('Ukuran file terlalu besar! Maksimal 5MB. Tolong kompres ukuran file Anda terlebih dahulu.'); this.value=''; return false; }">
+                                                </div>
+                                                <input type="file" id="me_logo_left" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer z-30" onchange="previewSingleImage(this, 'preview_me_logo_left', 'placeholder_me_logo_left')">
                                             </div>
-                                            <div class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue">
-                                                @if($logo_right)
-                                                    <img src="{{ $logo_right->temporaryUrl() }}" class="w-full h-full object-cover">
-                                                @elseif($existingLogoRight)
-                                                    <img src="{{ asset($existingLogoRight) }}" class="w-full h-full object-cover">
-                                                @else
+                                            <div wire:ignore class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue">
+                                                <div class="absolute inset-0 w-full h-full z-0 pointer-events-none">
+                                                    <img id="preview_me_logo_right" src="{{ $existingLogoRight ? asset($existingLogoRight) : '' }}" class="w-full h-full object-cover {{ $existingLogoRight ? '' : 'hidden' }}">
+                                                </div>
+                                                <div id="placeholder_me_logo_right" class="text-center relative z-10 pointer-events-none {{ $existingLogoRight ? 'hidden' : '' }}">
                                                     <x-lucide-award class="w-6 h-6 text-slate-300 group-hover:text-ksc-blue transition mb-2" />
                                                     <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest group-hover:text-ksc-blue transition">Logo Kanan</span>
-                                                @endif
-                                                <input type="file" wire:model="logo_right" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="if(this.files[0] && this.files[0].size > 5242880){ alert('Ukuran file terlalu besar! Maksimal 5MB. Tolong kompres ukuran file Anda terlebih dahulu.'); this.value=''; return false; }">
+                                                </div>
+                                                <input type="file" id="me_logo_right" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer z-30" onchange="previewSingleImage(this, 'preview_me_logo_right', 'placeholder_me_logo_right')">
                                             </div>
                                         </div>
                                         <div class="flex justify-between mt-1">
@@ -563,16 +561,15 @@ new class extends Component {
                                     </div>
                                     <div>
                                         <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Banner Event</label>
-                                        <div class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue">
-                                            @if($banner)
-                                                <img src="{{ $banner->temporaryUrl() }}" class="w-full h-full object-cover">
-                                            @elseif($existingBanner)
-                                                <img src="{{ asset($existingBanner) }}" class="w-full h-full object-cover">
-                                            @else
+                                        <div wire:ignore class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue">
+                                            <div class="absolute inset-0 w-full h-full z-0 pointer-events-none">
+                                                <img id="preview_me_banner" src="{{ $existingBanner ? asset($existingBanner) : '' }}" class="w-full h-full object-cover {{ $existingBanner ? '' : 'hidden' }}">
+                                            </div>
+                                            <div id="placeholder_me_banner" class="text-center relative z-10 pointer-events-none {{ $existingBanner ? 'hidden' : '' }}">
                                                 <x-lucide-image class="w-6 h-6 text-slate-300 group-hover:text-ksc-blue transition mb-2" />
                                                 <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest group-hover:text-ksc-blue transition">Unggah Banner</span>
-                                            @endif
-                                            <input type="file" wire:model="banner" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="if(this.files[0] && this.files[0].size > 5242880){ alert('Ukuran file terlalu besar! Maksimal 5MB. Tolong kompres ukuran file Anda terlebih dahulu.'); this.value=''; return false; }">
+                                            </div>
+                                            <input type="file" id="me_banner" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer z-30" onchange="previewSingleImage(this, 'preview_me_banner', 'placeholder_me_banner')">
                                         </div>
                                         @error('banner') <span class="text-[9px] text-rose-500 font-bold mt-1 uppercase">{{ $message }}</span> @enderror
                                     </div>
@@ -634,14 +631,47 @@ new class extends Component {
                         class="flex-1 px-8 py-4 bg-white border border-slate-200 text-slate-500 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-50 transition">
                         Batal
                     </button>
-                    <button type="button"
-                        @click="const editor = tinymce.get('tinymce-editor'); if(editor) { $wire.description = editor.getContent(); } $wire.save()"
-                        wire:loading.attr="disabled" wire:target="save"
-                        class="flex-1 px-8 py-4 bg-ksc-blue text-white rounded-2xl font-black shadow-xl shadow-blue-100 uppercase text-[10px] tracking-widest hover:bg-blue-700 transition flex items-center justify-center gap-3">
-                        <span wire:loading.remove wire:target="save">
+                    <button type="button" id="meSubmitBtn"
+                        @click="
+                            const editor = tinymce.get('tinymce-editor');
+                            if(editor) { $wire.description = editor.getContent(); }
+                            
+                            let promises = [];
+                            let ll = document.getElementById('me_logo_left')?.files[0];
+                            if (ll) promises.push(new Promise((resolve, reject) => { @this.upload('logo_left', ll, resolve, reject); }));
+                            
+                            let lr = document.getElementById('me_logo_right')?.files[0];
+                            if (lr) promises.push(new Promise((resolve, reject) => { @this.upload('logo_right', lr, resolve, reject); }));
+                            
+                            let bn = document.getElementById('me_banner')?.files[0];
+                            if (bn) promises.push(new Promise((resolve, reject) => { @this.upload('banner', bn, resolve, reject); }));
+                            
+                            const btn = document.getElementById('meSubmitBtn');
+                            const txtEl = document.getElementById('meSubmitText');
+                            const loadEl = document.getElementById('meSubmitLoading');
+                            
+                            if (promises.length > 0) {
+                                btn.disabled = true;
+                                txtEl.classList.add('hidden');
+                                loadEl.classList.remove('hidden');
+                                Promise.all(promises).then(() => {
+                                    $wire.save();
+                                    setTimeout(() => { btn.disabled = false; txtEl.classList.remove('hidden'); loadEl.classList.add('hidden'); }, 2000);
+                                }).catch(() => {
+                                    alert('Gagal mengunggah file. Silakan coba lagi.');
+                                    btn.disabled = false;
+                                    txtEl.classList.remove('hidden');
+                                    loadEl.classList.add('hidden');
+                                });
+                            } else {
+                                $wire.save();
+                            }
+                        "
+                        class="flex-1 px-8 py-4 bg-ksc-blue text-white rounded-2xl font-black shadow-xl shadow-blue-100 uppercase text-[10px] tracking-widest hover:bg-blue-700 transition flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed">
+                        <span id="meSubmitText">
                             {{ $modalMode === 'create' ? 'Simpan Event' : 'Perbarui Data' }}
                         </span>
-                        <span wire:loading wire:target="save" class="flex items-center gap-2">
+                        <span id="meSubmitLoading" class="hidden flex items-center gap-2">
                             <x-lucide-loader-2 class="w-4 h-4 animate-spin" />
                             <span>Memproses...</span>
                         </span>

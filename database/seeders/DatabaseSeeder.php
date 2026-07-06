@@ -19,13 +19,13 @@ class DatabaseSeeder extends Seeder
             RolePermissionSeeder::class,
             UserSeeder::class,
             RequirementParameterSeeder::class,
-            // NotificationSeeder::class,
-            // ClubSeeder::class,
-            // FinanceAccountSeeder::class,
-            // CategorySeeder::class,
-            // EventSeeder::class,
-            // EventCategorySeeder::class,
-            // RegistrationSeeder::class,
+            NotificationSeeder::class,
+            ClubSeeder::class,
+            FinanceAccountSeeder::class,
+            CategorySeeder::class,
+            EventSeeder::class,
+            EventCategorySeeder::class,
+            RegistrationSeeder::class,
         ]);
     }
 }

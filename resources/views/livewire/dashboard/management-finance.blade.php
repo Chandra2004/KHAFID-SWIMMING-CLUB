@@ -294,7 +294,28 @@ new class extends Component {
                     </button>
                 </div>
 
-                <form wire:submit.prevent="save" class="p-8">
+                <form x-data @submit.prevent="
+                    let promises = [];
+                    let img = document.getElementById('mf_image')?.files[0];
+                    if (img) promises.push(new Promise((resolve, reject) => { @this.upload('image', img, resolve, reject); }));
+                    
+                    if (promises.length > 0) {
+                        $refs.mfSubmitBtn.disabled = true;
+                        $refs.mfSubmitText.classList.add('hidden');
+                        $refs.mfLoadingText.classList.remove('hidden');
+                        Promise.all(promises).then(() => {
+                            @this.call('save');
+                            setTimeout(() => { $refs.mfSubmitBtn.disabled = false; $refs.mfSubmitText.classList.remove('hidden'); $refs.mfLoadingText.classList.add('hidden'); }, 2000);
+                        }).catch(() => {
+                            alert('Gagal mengunggah gambar. Silakan coba lagi.');
+                            $refs.mfSubmitBtn.disabled = false;
+                            $refs.mfSubmitText.classList.remove('hidden');
+                            $refs.mfLoadingText.classList.add('hidden');
+                        });
+                    } else {
+                        @this.call('save');
+                    }
+                " class="p-8">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="md:col-span-2">
                             <label
@@ -343,20 +364,17 @@ new class extends Component {
                                 class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2 ml-1 text-center">Gambar
                                 / QRIS (Optional)</label>
                             <div class="flex items-center justify-center gap-6">
-                                <div
-                                    class="w-32 h-32 bg-slate-50 rounded-[2rem] overflow-hidden border-4 border-white shadow-xl flex items-center justify-center">
-                                    @if ($image)
-                                        <img src="{{ $image->temporaryUrl() }}" class="w-full h-full object-cover">
-                                    @elseif($existingImage)
-                                        <img src="{{ asset($existingImage) }}" class="w-full h-full object-cover">
-                                    @else
+                                <div wire:ignore
+                                    class="w-32 h-32 bg-slate-50 rounded-[2rem] overflow-hidden border-4 border-white shadow-xl flex items-center justify-center relative">
+                                    <img id="preview_mf_image" src="{{ $existingImage ? asset($existingImage) : '' }}" class="w-full h-full object-cover {{ $existingImage ? '' : 'hidden' }}">
+                                    <div id="placeholder_mf_image" class="{{ $existingImage ? 'hidden' : 'flex' }} items-center justify-center w-full h-full absolute inset-0">
                                         <x-lucide-qr-code class="w-10 h-10 text-slate-300" />
-                                    @endif
+                                    </div>
                                 </div>
                                 <label
                                     class="bg-emerald-600 text-white px-6 py-3 rounded-2xl shadow-xl shadow-emerald-100 cursor-pointer hover:bg-emerald-700 transition font-bold text-xs">
                                     Upload QRIS/Image
-                                    <input type="file" wire:model="image" class="hidden" accept="image/*" onchange="if(this.files[0] && this.files[0].size > 5242880){ alert('Ukuran file terlalu besar! Maksimal 5MB. Tolong kompres ukuran file Anda terlebih dahulu.'); this.value=''; return false; }">
+                                    <input type="file" id="mf_image" class="hidden" accept="image/*" onchange="previewSingleImage(this, 'preview_mf_image', 'placeholder_mf_image')">
                                 </label>
                             </div>
                             @error('image')
@@ -384,12 +402,12 @@ new class extends Component {
                     <div class="flex items-center pt-8 mt-8 border-t border-slate-100 gap-4">
                         <button type="button" wire:click="$set('showModal', false)"
                             class="flex-1 px-6 py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold hover:bg-slate-200 transition">Batal</button>
-                        <button type="submit" wire:loading.attr="disabled" wire:target="save"
-                            class="flex-1 px-6 py-4 bg-emerald-600 text-white rounded-2xl font-bold hover:bg-emerald-700 transition shadow-xl shadow-emerald-100 flex items-center justify-center gap-2">
-                            <span wire:loading.remove wire:target="save">
+                        <button type="submit" x-ref="mfSubmitBtn"
+                            class="flex-1 px-6 py-4 bg-emerald-600 text-white rounded-2xl font-bold hover:bg-emerald-700 transition shadow-xl shadow-emerald-100 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed">
+                            <span x-ref="mfSubmitText">
                                 {{ $modalMode === 'create' ? 'Simpan Data' : 'Perbarui Data' }}
                             </span>
-                            <span wire:loading wire:target="save" class="flex items-center gap-2">
+                            <span x-ref="mfLoadingText" class="hidden flex items-center gap-2">
                                 <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg"
                                     fill="none" viewBox="0 0 24 24">
                                     <circle class="opacity-25" cx="12" cy="12" r="10"

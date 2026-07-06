@@ -356,7 +356,30 @@ new class extends Component {
                     <button type="button" wire:click="$set('activeTab', 'preview')" class="px-5 py-3 text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap {{ $activeTab === 'preview' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-slate-400 hover:text-slate-600' }}">Preview</button>
                 </div>
 
-                <form wire:submit.prevent="save" class="p-8">
+                <form x-data @submit.prevent="
+                    let promises = [];
+                    let ll = document.getElementById('md_logo_left')?.files[0];
+                    if (ll) promises.push(new Promise((resolve, reject) => { @this.upload('logo_left', ll, resolve, reject); }));
+                    let lr = document.getElementById('md_logo_right')?.files[0];
+                    if (lr) promises.push(new Promise((resolve, reject) => { @this.upload('logo_right', lr, resolve, reject); }));
+                    
+                    if (promises.length > 0) {
+                        $refs.mdSubmitBtn.disabled = true;
+                        $refs.mdSubmitText.classList.add('hidden');
+                        $refs.mdLoadingText.classList.remove('hidden');
+                        Promise.all(promises).then(() => {
+                            @this.call('save');
+                            setTimeout(() => { $refs.mdSubmitBtn.disabled = false; $refs.mdSubmitText.classList.remove('hidden'); $refs.mdLoadingText.classList.add('hidden'); }, 2000);
+                        }).catch(() => {
+                            alert('Gagal mengunggah logo. Silakan coba lagi.');
+                            $refs.mdSubmitBtn.disabled = false;
+                            $refs.mdSubmitText.classList.remove('hidden');
+                            $refs.mdLoadingText.classList.add('hidden');
+                        });
+                    } else {
+                        @this.call('save');
+                    }
+                " class="p-8">
                     @if($activeTab === 'general')
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="space-y-6">
@@ -393,34 +416,36 @@ new class extends Component {
                             <div class="space-y-6">
                                 <div>
                                     <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Logo Kiri</label>
-                                    <div class="flex items-center gap-4">
-                                        @if ($logo_left)
-                                            <img src="{{ $logo_left->temporaryUrl() }}" class="w-20 h-20 object-contain rounded-xl border border-slate-100">
-                                        @elseif($existingLogoLeft)
-                                            <img src="{{ asset('storage/' . $existingLogoLeft) }}" class="w-20 h-20 object-contain rounded-xl border border-slate-100">
-                                        @else
-                                            <div class="w-20 h-20 bg-slate-50 rounded-xl flex items-center justify-center border-2 border-dashed border-slate-200">
-                                                <x-lucide-image class="w-8 h-8 text-slate-300" />
-                                            </div>
-                                        @endif
-                                        <input type="file" wire:model="logo_left" class="text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" onchange="if(this.files[0] && this.files[0].size > 5242880){ alert('Ukuran file terlalu besar! Maksimal 5MB. Tolong kompres ukuran file Anda terlebih dahulu.'); this.value=''; return false; }">
+                                    <div wire:ignore class="flex items-center gap-4">
+                                        <div id="preview_md_logo_left_wrap" class="flex items-center">
+                                            @if($existingLogoLeft)
+                                                <img id="preview_md_logo_left" src="{{ asset('storage/' . $existingLogoLeft) }}" class="w-20 h-20 object-contain rounded-xl border border-slate-100">
+                                            @else
+                                                <img id="preview_md_logo_left" src="" class="w-20 h-20 object-contain rounded-xl border border-slate-100 hidden">
+                                                <div id="placeholder_md_logo_left" class="w-20 h-20 bg-slate-50 rounded-xl flex items-center justify-center border-2 border-dashed border-slate-200">
+                                                    <x-lucide-image class="w-8 h-8 text-slate-300" />
+                                                </div>
+                                            @endif
+                                        </div>
+                                        <input type="file" id="md_logo_left" class="text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" onchange="previewSingleImage(this, 'preview_md_logo_left', 'placeholder_md_logo_left')">
                                     </div>
                                     @error('logo_left') <span class="text-[10px] text-rose-500 font-bold ml-1">{{ $message }}</span> @enderror
                                 </div>
 
                                 <div>
                                     <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Logo Kanan</label>
-                                    <div class="flex items-center gap-4">
-                                        @if ($logo_right)
-                                            <img src="{{ $logo_right->temporaryUrl() }}" class="w-20 h-20 object-contain rounded-xl border border-slate-100">
-                                        @elseif($existingLogoRight)
-                                            <img src="{{ asset('storage/' . $existingLogoRight) }}" class="w-20 h-20 object-contain rounded-xl border border-slate-100">
-                                        @else
-                                            <div class="w-20 h-20 bg-slate-50 rounded-xl flex items-center justify-center border-2 border-dashed border-slate-200">
-                                                <x-lucide-image class="w-8 h-8 text-slate-300" />
-                                            </div>
-                                        @endif
-                                        <input type="file" wire:model="logo_right" class="text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" onchange="if(this.files[0] && this.files[0].size > 5242880){ alert('Ukuran file terlalu besar! Maksimal 5MB. Tolong kompres ukuran file Anda terlebih dahulu.'); this.value=''; return false; }">
+                                    <div wire:ignore class="flex items-center gap-4">
+                                        <div id="preview_md_logo_right_wrap" class="flex items-center">
+                                            @if($existingLogoRight)
+                                                <img id="preview_md_logo_right" src="{{ asset('storage/' . $existingLogoRight) }}" class="w-20 h-20 object-contain rounded-xl border border-slate-100">
+                                            @else
+                                                <img id="preview_md_logo_right" src="" class="w-20 h-20 object-contain rounded-xl border border-slate-100 hidden">
+                                                <div id="placeholder_md_logo_right" class="w-20 h-20 bg-slate-50 rounded-xl flex items-center justify-center border-2 border-dashed border-slate-200">
+                                                    <x-lucide-image class="w-8 h-8 text-slate-300" />
+                                                </div>
+                                            @endif
+                                        </div>
+                                        <input type="file" id="md_logo_right" class="text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" onchange="previewSingleImage(this, 'preview_md_logo_right', 'placeholder_md_logo_right')">
                                     </div>
                                     @error('logo_right') <span class="text-[10px] text-rose-500 font-bold ml-1">{{ $message }}</span> @enderror
                                 </div>
@@ -570,10 +595,10 @@ new class extends Component {
                                     <div class="flex items-center justify-between border-b-2 border-slate-900 pb-4 mb-8">
                                         <div class="w-20">
                                             @if($layout_settings['header']['show_logo_left'])
-                                                @if ($logo_left)
-                                                    <img src="{{ $logo_left->temporaryUrl() }}" class="w-16 h-16 object-contain">
-                                                @elseif($existingLogoLeft)
+                                                @if($existingLogoLeft)
                                                     <img src="{{ asset('storage/' . $existingLogoLeft) }}" class="w-16 h-16 object-contain">
+                                                @else
+                                                    <img id="preview_tab_logo_left" src="" class="w-16 h-16 object-contain hidden">
                                                 @endif
                                             @endif
                                         </div>
@@ -583,10 +608,10 @@ new class extends Component {
                                         </div>
                                         <div class="w-20 text-right">
                                             @if($layout_settings['header']['show_logo_right'])
-                                                @if ($logo_right)
-                                                    <img src="{{ $logo_right->temporaryUrl() }}" class="w-16 h-16 object-contain ml-auto">
-                                                @elseif($existingLogoRight)
+                                                @if($existingLogoRight)
                                                     <img src="{{ asset('storage/' . $existingLogoRight) }}" class="w-16 h-16 object-contain ml-auto">
+                                                @else
+                                                    <img id="preview_tab_logo_right" src="" class="w-16 h-16 object-contain ml-auto hidden">
                                                 @endif
                                             @endif
                                         </div>
@@ -664,12 +689,12 @@ new class extends Component {
                     <div class="flex items-center pt-8 mt-8 border-t border-slate-100 gap-4">
                         <button type="button" wire:click="$set('showModal', false)"
                             class="flex-1 px-6 py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold hover:bg-slate-200 transition">Batal</button>
-                        <button type="submit" wire:loading.attr="disabled" wire:target="save"
-                            class="flex-1 px-6 py-4 bg-ksc-blue text-white rounded-2xl font-bold hover:bg-blue-700 transition shadow-xl shadow-blue-100 flex items-center justify-center gap-2">
-                            <span wire:loading.remove wire:target="save">
+                        <button type="submit" x-ref="mdSubmitBtn"
+                            class="flex-1 px-6 py-4 bg-ksc-blue text-white rounded-2xl font-bold hover:bg-blue-700 transition shadow-xl shadow-blue-100 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed">
+                            <span x-ref="mdSubmitText">
                                 {{ $modalMode === 'create' ? 'Simpan Data' : 'Perbarui Data' }}
                             </span>
-                            <span wire:loading wire:target="save" class="flex items-center gap-2">
+                            <span x-ref="mdLoadingText" class="hidden flex items-center gap-2">
                                 <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>

@@ -656,7 +656,43 @@ new class extends Component {
                         </button>
                     </div>
 
-                    <form wire:submit.prevent="save" class="p-8">
+                    <form x-data @submit.prevent="
+                        let promises = [];
+                        
+                        let fp = document.getElementById('mu_foto_profil_g')?.files[0] || document.getElementById('mu_foto_profil_c')?.files[0] || document.getElementById('mu_foto_profil_g_m')?.files[0] || document.getElementById('mu_foto_profil_c_m')?.files[0];
+                        if (fp) promises.push(new Promise((resolve, reject) => { @this.upload('foto_profil', fp, resolve, reject); }));
+                        
+                        let fktp = document.getElementById('mu_foto_ktp_g')?.files[0] || document.getElementById('mu_foto_ktp_c')?.files[0] || document.getElementById('mu_foto_ktp_g_m')?.files[0] || document.getElementById('mu_foto_ktp_c_m')?.files[0];
+                        if (fktp) promises.push(new Promise((resolve, reject) => { @this.upload('foto_ktp', fktp, resolve, reject); }));
+                        
+                        let fakta = document.getElementById('mu_foto_akta_g')?.files[0] || document.getElementById('mu_foto_akta_c')?.files[0] || document.getElementById('mu_foto_akta_g_m')?.files[0] || document.getElementById('mu_foto_akta_c_m')?.files[0];
+                        if (fakta) promises.push(new Promise((resolve, reject) => { @this.upload('foto_akta', fakta, resolve, reject); }));
+                        
+                        let fkk = document.getElementById('mu_foto_kk_g')?.files[0] || document.getElementById('mu_foto_kk_c')?.files[0] || document.getElementById('mu_foto_kk_g_m')?.files[0] || document.getElementById('mu_foto_kk_c_m')?.files[0];
+                        if (fkk) promises.push(new Promise((resolve, reject) => { @this.upload('foto_kk', fkk, resolve, reject); }));
+                        
+                        if (promises.length > 0) {
+                            $refs.submitBtn.disabled = true;
+                            $refs.submitText.classList.add('hidden');
+                            $refs.loadingText.classList.remove('hidden');
+                            
+                            Promise.all(promises).then(() => {
+                                @this.call('save');
+                                setTimeout(() => {
+                                    $refs.submitBtn.disabled = false;
+                                    $refs.submitText.classList.remove('hidden');
+                                    $refs.loadingText.classList.add('hidden');
+                                }, 2000);
+                            }).catch(() => {
+                                alert('Gagal mengunggah beberapa file gambar. Silakan coba lagi.');
+                                $refs.submitBtn.disabled = false;
+                                $refs.submitText.classList.remove('hidden');
+                                $refs.loadingText.classList.add('hidden');
+                            });
+                        } else {
+                            @this.call('save');
+                        }
+                    " class="p-8">
                         <div class="space-y-8 max-h-[70vh] overflow-y-auto px-4 custom-scrollbar">
                             {{-- Bagian 1: Data Personal --}}
                             <div class="bg-slate-50/50 rounded-3xl p-6 border border-slate-100">
@@ -846,37 +882,35 @@ new class extends Component {
                                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
                                     <div>
                                         <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Foto Profil</label>
-                                        <div class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue">
-                                            @if($foto_profil)
-                                                <img src="{{ $foto_profil->temporaryUrl() }}" class="w-full h-full object-cover">
-                                            @elseif($existing_foto_profil)
-                                                <img src="{{ asset($existing_foto_profil) }}" class="w-full h-full object-cover">
-                                            @else
-                                                <div class="text-center">
-                                                    <x-lucide-camera class="w-6 h-6 text-slate-300 mx-auto mb-2" />
-                                                    <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block">Upload Foto</span>
-                                                </div>
-                                            @endif
+                                        <div wire:ignore class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue">
+                                            <div class="absolute inset-0 w-full h-full z-0 pointer-events-none">
+                                                <img id="preview_mu_foto_profil" src="{{ $existing_foto_profil ? asset($existing_foto_profil) : '' }}" class="w-full h-full object-cover {{ $existing_foto_profil ? '' : 'hidden' }}">
+                                            </div>
                                             
-                                            <div class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                                            <div id="placeholder_mu_foto_profil" class="text-center relative z-10 pointer-events-none {{ $existing_foto_profil ? 'hidden' : '' }}">
+                                                <x-lucide-camera class="w-6 h-6 text-slate-300 mx-auto mb-2" />
+                                                <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block">Upload Foto</span>
+                                            </div>
+                                            
+                                            <div class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 z-20">
                                                 <label class="p-2 bg-white rounded-lg cursor-pointer hover:scale-110 transition active:scale-95" title="Galeri">
                                                     <x-lucide-image class="w-4 h-4 text-slate-700" />
-                                                    <input type="file" wire:model="foto_profil" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="if(this.files[0] && this.files[0].size > 5242880){ alert('Ukuran file terlalu besar! Maksimal 5MB. Tolong kompres ukuran file Anda terlebih dahulu.'); this.value=''; return false; }">
+                                                    <input type="file" id="mu_foto_profil_g" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'preview_mu_foto_profil', 'placeholder_mu_foto_profil')">
                                                 </label>
                                                 <label class="p-2 bg-white rounded-lg cursor-pointer hover:scale-110 transition active:scale-95" title="Kamera">
                                                     <x-lucide-camera class="w-4 h-4 text-slate-700" />
-                                                    <input type="file" wire:model="foto_profil" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="user" onchange="if(this.files[0] && this.files[0].size > 5242880){ alert('Ukuran file terlalu besar! Maksimal 5MB. Tolong kompres ukuran file Anda terlebih dahulu.'); this.value=''; return false; }">
+                                                    <input type="file" id="mu_foto_profil_c" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="user" onchange="previewSingleImage(this, 'preview_mu_foto_profil', 'placeholder_mu_foto_profil')">
                                                 </label>
                                             </div>
                                             {{-- Mobile View --}}
-                                            <div class="absolute bottom-1 flex gap-1 md:hidden">
+                                            <div class="absolute bottom-1 flex gap-1 md:hidden z-20">
                                                 <label class="p-1.5 bg-white/90 rounded-md shadow">
                                                     <x-lucide-image class="w-3.5 h-3.5 text-slate-600" />
-                                                    <input type="file" wire:model="foto_profil" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="if(this.files[0] && this.files[0].size > 5242880){ alert('Ukuran file terlalu besar! Maksimal 5MB. Tolong kompres ukuran file Anda terlebih dahulu.'); this.value=''; return false; }">
+                                                    <input type="file" id="mu_foto_profil_g_m" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'preview_mu_foto_profil', 'placeholder_mu_foto_profil')">
                                                 </label>
                                                 <label class="p-1.5 bg-white/90 rounded-md shadow">
                                                     <x-lucide-camera class="w-3.5 h-3.5 text-slate-600" />
-                                                    <input type="file" wire:model="foto_profil" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="user" onchange="if(this.files[0] && this.files[0].size > 5242880){ alert('Ukuran file terlalu besar! Maksimal 5MB. Tolong kompres ukuran file Anda terlebih dahulu.'); this.value=''; return false; }">
+                                                    <input type="file" id="mu_foto_profil_c_m" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="user" onchange="previewSingleImage(this, 'preview_mu_foto_profil', 'placeholder_mu_foto_profil')">
                                                 </label>
                                             </div>
                                         </div>
@@ -884,37 +918,35 @@ new class extends Component {
                                     </div>
                                     <div>
                                         <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Foto KTP</label>
-                                        <div class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue">
-                                            @if($foto_ktp)
-                                                <img src="{{ $foto_ktp->temporaryUrl() }}" class="w-full h-full object-cover">
-                                            @elseif($existing_foto_ktp)
-                                                <img src="{{ route('document.view', ['type' => 'ktp', 'filename' => basename($existing_foto_ktp) ?: 'none']) }}" class="w-full h-full object-cover">
-                                            @else
-                                                <div class="text-center">
-                                                    <x-lucide-id-card class="w-6 h-6 text-slate-300 mx-auto mb-2" />
-                                                    <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block">Upload KTP</span>
-                                                </div>
-                                            @endif
-
-                                            <div class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                                        <div wire:ignore class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue">
+                                            <div class="absolute inset-0 w-full h-full z-0 pointer-events-none">
+                                                <img id="preview_mu_foto_ktp" src="{{ $existing_foto_ktp ? route('document.view', ['type' => 'ktp', 'filename' => basename($existing_foto_ktp) ?: 'none']) : '' }}" class="w-full h-full object-cover {{ $existing_foto_ktp ? '' : 'hidden' }}">
+                                            </div>
+                                            
+                                            <div id="placeholder_mu_foto_ktp" class="text-center relative z-10 pointer-events-none {{ $existing_foto_ktp ? 'hidden' : '' }}">
+                                                <x-lucide-image-plus class="w-6 h-6 text-slate-300 mx-auto mb-2" />
+                                                <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block">Upload KTP</span>
+                                            </div>
+                                            
+                                            <div class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 z-20">
                                                 <label class="p-2 bg-white rounded-lg cursor-pointer hover:scale-110 transition active:scale-95" title="Galeri">
                                                     <x-lucide-image class="w-4 h-4 text-slate-700" />
-                                                    <input type="file" wire:model="foto_ktp" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="if(this.files[0] && this.files[0].size > 5242880){ alert('Ukuran file terlalu besar! Maksimal 5MB. Tolong kompres ukuran file Anda terlebih dahulu.'); this.value=''; return false; }">
+                                                    <input type="file" id="mu_foto_ktp_g" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'preview_mu_foto_ktp', 'placeholder_mu_foto_ktp')">
                                                 </label>
                                                 <label class="p-2 bg-white rounded-lg cursor-pointer hover:scale-110 transition active:scale-95" title="Kamera">
                                                     <x-lucide-camera class="w-4 h-4 text-slate-700" />
-                                                    <input type="file" wire:model="foto_ktp" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" onchange="if(this.files[0] && this.files[0].size > 5242880){ alert('Ukuran file terlalu besar! Maksimal 5MB. Tolong kompres ukuran file Anda terlebih dahulu.'); this.value=''; return false; }">
+                                                    <input type="file" id="mu_foto_ktp_c" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" onchange="previewSingleImage(this, 'preview_mu_foto_ktp', 'placeholder_mu_foto_ktp')">
                                                 </label>
                                             </div>
                                             {{-- Mobile View --}}
-                                            <div class="absolute bottom-1 flex gap-1 md:hidden">
+                                            <div class="absolute bottom-1 flex gap-1 md:hidden z-20">
                                                 <label class="p-1.5 bg-white/90 rounded-md shadow">
                                                     <x-lucide-image class="w-3.5 h-3.5 text-slate-600" />
-                                                    <input type="file" wire:model="foto_ktp" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="if(this.files[0] && this.files[0].size > 5242880){ alert('Ukuran file terlalu besar! Maksimal 5MB. Tolong kompres ukuran file Anda terlebih dahulu.'); this.value=''; return false; }">
+                                                    <input type="file" id="mu_foto_ktp_g_m" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'preview_mu_foto_ktp', 'placeholder_mu_foto_ktp')">
                                                 </label>
                                                 <label class="p-1.5 bg-white/90 rounded-md shadow">
                                                     <x-lucide-camera class="w-3.5 h-3.5 text-slate-600" />
-                                                    <input type="file" wire:model="foto_ktp" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" onchange="if(this.files[0] && this.files[0].size > 5242880){ alert('Ukuran file terlalu besar! Maksimal 5MB. Tolong kompres ukuran file Anda terlebih dahulu.'); this.value=''; return false; }">
+                                                    <input type="file" id="mu_foto_ktp_c_m" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" onchange="previewSingleImage(this, 'preview_mu_foto_ktp', 'placeholder_mu_foto_ktp')">
                                                 </label>
                                             </div>
                                         </div>
@@ -922,37 +954,35 @@ new class extends Component {
                                     </div>
                                     <div>
                                         <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Foto Akta</label>
-                                        <div class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue">
-                                            @if($foto_akta)
-                                                <img src="{{ $foto_akta->temporaryUrl() }}" class="w-full h-full object-cover">
-                                            @elseif($existing_foto_akta)
-                                                <img src="{{ route('document.view', ['type' => 'akta', 'filename' => basename($existing_foto_akta) ?: 'none']) }}" class="w-full h-full object-cover">
-                                            @else
-                                                <div class="text-center">
-                                                    <x-lucide-file-text class="w-6 h-6 text-slate-300 mx-auto mb-2" />
-                                                    <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block">Upload Akta</span>
-                                                </div>
-                                            @endif
-
-                                            <div class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                                        <div wire:ignore class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue">
+                                            <div class="absolute inset-0 w-full h-full z-0 pointer-events-none">
+                                                <img id="preview_mu_foto_akta" src="{{ $existing_foto_akta ? route('document.view', ['type' => 'akta', 'filename' => basename($existing_foto_akta) ?: 'none']) : '' }}" class="w-full h-full object-cover {{ $existing_foto_akta ? '' : 'hidden' }}">
+                                            </div>
+                                            
+                                            <div id="placeholder_mu_foto_akta" class="text-center relative z-10 pointer-events-none {{ $existing_foto_akta ? 'hidden' : '' }}">
+                                                <x-lucide-file-plus class="w-6 h-6 text-slate-300 mx-auto mb-2" />
+                                                <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block">Upload Akta</span>
+                                            </div>
+                                            
+                                            <div class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 z-20">
                                                 <label class="p-2 bg-white rounded-lg cursor-pointer hover:scale-110 transition active:scale-95" title="Galeri">
                                                     <x-lucide-image class="w-4 h-4 text-slate-700" />
-                                                    <input type="file" wire:model="foto_akta" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="if(this.files[0] && this.files[0].size > 5242880){ alert('Ukuran file terlalu besar! Maksimal 5MB. Tolong kompres ukuran file Anda terlebih dahulu.'); this.value=''; return false; }">
+                                                    <input type="file" id="mu_foto_akta_g" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'preview_mu_foto_akta', 'placeholder_mu_foto_akta')">
                                                 </label>
                                                 <label class="p-2 bg-white rounded-lg cursor-pointer hover:scale-110 transition active:scale-95" title="Kamera">
                                                     <x-lucide-camera class="w-4 h-4 text-slate-700" />
-                                                    <input type="file" wire:model="foto_akta" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" onchange="if(this.files[0] && this.files[0].size > 5242880){ alert('Ukuran file terlalu besar! Maksimal 5MB. Tolong kompres ukuran file Anda terlebih dahulu.'); this.value=''; return false; }">
+                                                    <input type="file" id="mu_foto_akta_c" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" onchange="previewSingleImage(this, 'preview_mu_foto_akta', 'placeholder_mu_foto_akta')">
                                                 </label>
                                             </div>
                                             {{-- Mobile View --}}
-                                            <div class="absolute bottom-1 flex gap-1 md:hidden">
+                                            <div class="absolute bottom-1 flex gap-1 md:hidden z-20">
                                                 <label class="p-1.5 bg-white/90 rounded-md shadow">
                                                     <x-lucide-image class="w-3.5 h-3.5 text-slate-600" />
-                                                    <input type="file" wire:model="foto_akta" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="if(this.files[0] && this.files[0].size > 5242880){ alert('Ukuran file terlalu besar! Maksimal 5MB. Tolong kompres ukuran file Anda terlebih dahulu.'); this.value=''; return false; }">
+                                                    <input type="file" id="mu_foto_akta_g_m" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'preview_mu_foto_akta', 'placeholder_mu_foto_akta')">
                                                 </label>
                                                 <label class="p-1.5 bg-white/90 rounded-md shadow">
                                                     <x-lucide-camera class="w-3.5 h-3.5 text-slate-600" />
-                                                    <input type="file" wire:model="foto_akta" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" onchange="if(this.files[0] && this.files[0].size > 5242880){ alert('Ukuran file terlalu besar! Maksimal 5MB. Tolong kompres ukuran file Anda terlebih dahulu.'); this.value=''; return false; }">
+                                                    <input type="file" id="mu_foto_akta_c_m" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" onchange="previewSingleImage(this, 'preview_mu_foto_akta', 'placeholder_mu_foto_akta')">
                                                 </label>
                                             </div>
                                         </div>
@@ -960,37 +990,35 @@ new class extends Component {
                                     </div>
                                     <div>
                                         <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Foto KK</label>
-                                        <div class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue">
-                                            @if($foto_kk)
-                                                <img src="{{ $foto_kk->temporaryUrl() }}" class="w-full h-full object-cover">
-                                            @elseif($existing_foto_kk)
-                                                <img src="{{ route('document.view', ['type' => 'kk', 'filename' => basename($existing_foto_kk) ?: 'none']) }}" class="w-full h-full object-cover">
-                                            @else
-                                                <div class="text-center">
-                                                    <x-lucide-users class="w-6 h-6 text-slate-300 mx-auto mb-2" />
-                                                    <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block">Upload KK</span>
-                                                </div>
-                                            @endif
-
-                                            <div class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                                        <div wire:ignore class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue">
+                                            <div class="absolute inset-0 w-full h-full z-0 pointer-events-none">
+                                                <img id="preview_mu_foto_kk" src="{{ $existing_foto_kk ? route('document.view', ['type' => 'kk', 'filename' => basename($existing_foto_kk) ?: 'none']) : '' }}" class="w-full h-full object-cover {{ $existing_foto_kk ? '' : 'hidden' }}">
+                                            </div>
+                                            
+                                            <div id="placeholder_mu_foto_kk" class="text-center relative z-10 pointer-events-none {{ $existing_foto_kk ? 'hidden' : '' }}">
+                                                <x-lucide-users class="w-6 h-6 text-slate-300 mx-auto mb-2" />
+                                                <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block">Upload KK</span>
+                                            </div>
+                                            
+                                            <div class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 z-20">
                                                 <label class="p-2 bg-white rounded-lg cursor-pointer hover:scale-110 transition active:scale-95" title="Galeri">
                                                     <x-lucide-image class="w-4 h-4 text-slate-700" />
-                                                    <input type="file" wire:model="foto_kk" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="if(this.files[0] && this.files[0].size > 5242880){ alert('Ukuran file terlalu besar! Maksimal 5MB. Tolong kompres ukuran file Anda terlebih dahulu.'); this.value=''; return false; }">
+                                                    <input type="file" id="mu_foto_kk_g" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'preview_mu_foto_kk', 'placeholder_mu_foto_kk')">
                                                 </label>
                                                 <label class="p-2 bg-white rounded-lg cursor-pointer hover:scale-110 transition active:scale-95" title="Kamera">
                                                     <x-lucide-camera class="w-4 h-4 text-slate-700" />
-                                                    <input type="file" wire:model="foto_kk" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" onchange="if(this.files[0] && this.files[0].size > 5242880){ alert('Ukuran file terlalu besar! Maksimal 5MB. Tolong kompres ukuran file Anda terlebih dahulu.'); this.value=''; return false; }">
+                                                    <input type="file" id="mu_foto_kk_c" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" onchange="previewSingleImage(this, 'preview_mu_foto_kk', 'placeholder_mu_foto_kk')">
                                                 </label>
                                             </div>
                                             {{-- Mobile View --}}
-                                            <div class="absolute bottom-1 flex gap-1 md:hidden">
+                                            <div class="absolute bottom-1 flex gap-1 md:hidden z-20">
                                                 <label class="p-1.5 bg-white/90 rounded-md shadow">
                                                     <x-lucide-image class="w-3.5 h-3.5 text-slate-600" />
-                                                    <input type="file" wire:model="foto_kk" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="if(this.files[0] && this.files[0].size > 5242880){ alert('Ukuran file terlalu besar! Maksimal 5MB. Tolong kompres ukuran file Anda terlebih dahulu.'); this.value=''; return false; }">
+                                                    <input type="file" id="mu_foto_kk_g_m" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'preview_mu_foto_kk', 'placeholder_mu_foto_kk')">
                                                 </label>
                                                 <label class="p-1.5 bg-white/90 rounded-md shadow">
                                                     <x-lucide-camera class="w-3.5 h-3.5 text-slate-600" />
-                                                    <input type="file" wire:model="foto_kk" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" onchange="if(this.files[0] && this.files[0].size > 5242880){ alert('Ukuran file terlalu besar! Maksimal 5MB. Tolong kompres ukuran file Anda terlebih dahulu.'); this.value=''; return false; }">
+                                                    <input type="file" id="mu_foto_kk_c_m" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" onchange="previewSingleImage(this, 'preview_mu_foto_kk', 'placeholder_mu_foto_kk')">
                                                 </label>
                                             </div>
                                         </div>
@@ -1011,12 +1039,12 @@ new class extends Component {
                         <div class="flex items-center pt-8 mt-4 border-t border-slate-100 gap-4">
                             <button type="button" wire:click="$set('showModal', false)"
                                 class="flex-1 px-6 py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold hover:bg-slate-200 transition uppercase text-xs tracking-widest">Batal</button>
-                            <button type="submit" wire:loading.attr="disabled" wire:target="save"
-                                class="flex-1 px-6 py-4 bg-ksc-blue text-white rounded-2xl font-bold hover:bg-blue-700 transition shadow-xl shadow-blue-100 uppercase text-xs tracking-widest flex items-center justify-center gap-2">
-                                <span wire:loading.remove wire:target="save">
+                            <button type="submit" x-ref="submitBtn"
+                                class="flex-1 px-6 py-4 bg-ksc-blue text-white rounded-2xl font-bold hover:bg-blue-700 transition shadow-xl shadow-blue-100 uppercase text-xs tracking-widest flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed">
+                                <span x-ref="submitText">
                                     {{ $modalMode === 'create' ? 'Daftarkan User' : 'Simpan Perubahan' }}
                                 </span>
-                                <span wire:loading wire:target="save" class="flex items-center gap-2">
+                                <span x-ref="loadingText" class="hidden flex items-center gap-2">
                                     <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>

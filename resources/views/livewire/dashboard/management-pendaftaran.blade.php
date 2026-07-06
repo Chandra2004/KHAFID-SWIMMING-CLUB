@@ -1366,7 +1366,8 @@ new class extends Component {
 
     {{-- Create Manual Modal --}}
     @if ($showCreateModal)
-        <div class="fixed inset-0 z-50 overflow-y-auto px-4 py-6 sm:px-0 flex items-center justify-center">
+        <div x-data="{}"
+            class="fixed inset-0 z-50 overflow-y-auto px-4 py-6 sm:px-0 flex items-center justify-center">
             <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" wire:click="closeCreateModal"></div>
 
             <div
@@ -1532,6 +1533,28 @@ new class extends Component {
                                                                     {{ $userPreview->profile?->gender ?: '-' }}</p>
                                                             </div>
                                                         </div>
+                                                        <div class="grid grid-cols-2 gap-4">
+                                                            <div>
+                                                                <label
+                                                                    class="block text-[9px] font-black text-slate-400 uppercase tracking-widest">NIK / No. Identitas</label>
+                                                                <p class="text-xs font-bold text-slate-800">
+                                                                    {{ $userPreview->profile?->identity_number ?: '-' }}</p>
+                                                            </div>
+                                                            <div>
+                                                                <label
+                                                                    class="block text-[9px] font-black text-slate-400 uppercase tracking-widest">Tinggi & Berat Badan</label>
+                                                                <p class="text-xs font-bold text-slate-800">
+                                                                    {{ $userPreview->profile?->height ? $userPreview->profile->height . ' cm' : '-' }} / {{ $userPreview->profile?->weight ? $userPreview->profile->weight . ' kg' : '-' }}</p>
+                                                            </div>
+                                                        </div>
+                                                        @if ($userPreview->profile?->medical_history)
+                                                            <div>
+                                                                <label
+                                                                    class="block text-[9px] font-black text-rose-400 uppercase tracking-widest">Riwayat Medis</label>
+                                                                <p class="text-xs font-bold text-rose-600">
+                                                                    {{ $userPreview->profile->medical_history }}</p>
+                                                            </div>
+                                                        @endif
                                                         <div class="grid grid-cols-2 gap-4">
                                                             <div>
                                                                 <label
@@ -1898,27 +1921,41 @@ new class extends Component {
                                                     <label
                                                         class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Unggah
                                                         Bukti Transfer</label>
-                                                    <div class="relative group cursor-pointer">
-                                                        <input type="file" wire:model="create_payment_proof"
+                                                    <div class="relative group cursor-pointer" wire:ignore>
+                                                        <input type="file" id="mp_payment_proof"
                                                             accept="image/*"
-                                                            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" required onchange="if(this.files[0] && this.files[0].size > 5242880){ alert('Ukuran file terlalu besar! Maksimal 5MB. Tolong kompres ukuran file Anda terlebih dahulu.'); this.value=''; return false; }">
+                                                            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" onchange="
+                                                                const file = this.files[0];
+                                                                if (!file) return;
+                                                                if (file.size > 5242880) { alert('Ukuran file terlalu besar! Maksimal 5MB.'); this.value=''; return; }
+                                                                const reader = new FileReader();
+                                                                reader.onload = function(e) {
+                                                                    const previewImg = document.getElementById('mp_proof_preview');
+                                                                    const placeholder = document.getElementById('mp_proof_placeholder');
+                                                                    const uploaded = document.getElementById('mp_proof_uploaded');
+                                                                    if (previewImg) { previewImg.src = e.target.result; previewImg.classList.remove('hidden'); }
+                                                                    if (placeholder) placeholder.classList.add('hidden');
+                                                                    if (uploaded) uploaded.classList.remove('hidden');
+                                                                };
+                                                                reader.readAsDataURL(file);
+                                                            ">
                                                         <div
-                                                            class="w-full h-32 bg-white border-2 border-dashed {{ $create_payment_proof ? 'border-blue-400 bg-blue-50/50' : 'border-slate-200 group-hover:border-blue-400 group-hover:bg-blue-50/30' }} rounded-2xl flex flex-col items-center justify-center transition-all relative z-10 overflow-hidden">
-                                                            @if ($create_payment_proof)
-                                                                <img src="{{ $create_payment_proof->temporaryUrl() }}"
-                                                                    class="absolute inset-0 w-full h-full object-cover opacity-30">
-                                                                <x-lucide-check-circle
-                                                                    class="w-8 h-8 text-blue-600 mb-2 relative z-10" />
-                                                                <span
-                                                                    class="text-xs font-black text-blue-700 uppercase tracking-widest relative z-10">Bukti
-                                                                    Terunggah</span>
-                                                            @else
+                                                            class="w-full h-32 bg-white border-2 border-dashed border-slate-200 group-hover:border-blue-400 group-hover:bg-blue-50/30 rounded-2xl flex flex-col items-center justify-center transition-all relative z-10 overflow-hidden">
+                                                            <img id="mp_proof_preview" src="" class="absolute inset-0 w-full h-full object-cover opacity-30 hidden">
+                                                            <div id="mp_proof_placeholder" class="flex flex-col items-center justify-center relative z-10">
                                                                 <x-lucide-camera
                                                                     class="w-8 h-8 text-slate-300 group-hover:text-blue-400 transition-colors mb-2" />
                                                                 <span
                                                                     class="text-[10px] font-black text-slate-400 group-hover:text-blue-500 uppercase tracking-widest transition-colors">Pilih
                                                                     Foto Bukti</span>
-                                                            @endif
+                                                            </div>
+                                                            <div id="mp_proof_uploaded" class="hidden flex-col items-center justify-center relative z-10">
+                                                                <x-lucide-check-circle
+                                                                    class="w-8 h-8 text-blue-600 mb-2" />
+                                                                <span
+                                                                    class="text-xs font-black text-blue-700 uppercase tracking-widest">Bukti
+                                                                    Terunggah</span>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1952,12 +1989,28 @@ new class extends Component {
                 <div class="p-8 border-t border-slate-50 flex justify-end gap-3 bg-slate-50/30">
                     <button wire:click="closeCreateModal"
                         class="px-8 py-3.5 bg-white text-slate-600 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-slate-200 hover:bg-slate-50 transition">Batal</button>
-                    <button wire:click="saveManualRegistration"
-                        wire:loading.attr="disabled"
-                        wire:target="saveManualRegistration"
+                    <button type="button" id="mpSaveBtn"
+                        @click="
+                            const proofFile = document.getElementById('mp_payment_proof')?.files[0];
+                            if (proofFile) {
+                                document.getElementById('mpSaveText').classList.add('hidden');
+                                document.getElementById('mpSaveLoading').classList.remove('hidden');
+                                document.getElementById('mpSaveBtn').disabled = true;
+                                new Promise((resolve, reject) => { @this.upload('create_payment_proof', proofFile, resolve, reject); })
+                                    .then(() => { @this.call('saveManualRegistration'); })
+                                    .catch(() => {
+                                        alert('Gagal mengunggah bukti transfer. Silakan coba lagi.');
+                                        document.getElementById('mpSaveText').classList.remove('hidden');
+                                        document.getElementById('mpSaveLoading').classList.add('hidden');
+                                        document.getElementById('mpSaveBtn').disabled = false;
+                                    });
+                            } else {
+                                @this.call('saveManualRegistration');
+                            }
+                        "
                         class="px-8 py-3.5 bg-ksc-blue text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-blue-100 hover:bg-blue-700 transition transform hover:-translate-y-1 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2">
-                        <span wire:loading.remove wire:target="saveManualRegistration">Simpan Pendaftaran</span>
-                        <span wire:loading wire:target="saveManualRegistration" class="flex items-center gap-2">
+                        <span id="mpSaveText">Simpan Pendaftaran</span>
+                        <span id="mpSaveLoading" class="hidden flex items-center gap-2">
                             <x-lucide-loader-2 class="w-4 h-4 animate-spin" />
                             Menyimpan...
                         </span>
