@@ -41,6 +41,8 @@ class AppServiceProvider extends ServiceProvider
         if (!$isLocal || str_starts_with(config('app.url'), 'https://')) {
             \Illuminate\Support\Facades\URL::forceScheme('https');
             $_SERVER['HTTPS'] = 'on';
+            request()->server->set('HTTPS', 'on');
+            request()->server->set('SERVER_PORT', 443);
         }
         
         View::composer('*', function ($view) {
