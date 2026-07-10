@@ -151,10 +151,10 @@ new class extends Component {
                 $rules['password_confirm'] = 'same:password';
             }
 
-            $rules['foto_profil'] = 'nullable|image|max:5120';
-            $rules['foto_ktp'] = 'nullable|image|max:5120';
-            $rules['foto_akta'] = 'nullable|image|max:5120';
-            $rules['foto_kk'] = 'nullable|image|max:5120';
+            $rules['foto_profil'] = 'nullable|image|mimes:jpeg,png,webp|max:5120';
+            $rules['foto_ktp'] = 'nullable|image|mimes:jpeg,png,webp|max:5120';
+            $rules['foto_akta'] = 'nullable|image|mimes:jpeg,png,webp|max:5120';
+            $rules['foto_kk'] = 'nullable|image|mimes:jpeg,png,webp|max:5120';
 
             $this->validate($rules);
 
@@ -657,20 +657,41 @@ new class extends Component {
                     </div>
 
                     <form x-data @submit.prevent="
-                        $refs.submitBtn.disabled = true;
-                        $refs.submitText.classList.add('hidden');
-                        $refs.loadingText.classList.remove('hidden');
-                        @this.call('save').then(() => {
-                            setTimeout(() => {
+                        let promises = [];
+                        
+                        let fp = document.getElementById('mu_foto_profil_g')?.files[0] || document.getElementById('mu_foto_profil_c')?.files[0] || document.getElementById('mu_foto_profil_g_m')?.files[0] || document.getElementById('mu_foto_profil_c_m')?.files[0];
+                        if (fp) promises.push(new Promise((resolve, reject) => { @this.upload('foto_profil', fp, resolve, reject); }));
+                        
+                        let fktp = document.getElementById('mu_foto_ktp_g')?.files[0] || document.getElementById('mu_foto_ktp_c')?.files[0] || document.getElementById('mu_foto_ktp_g_m')?.files[0] || document.getElementById('mu_foto_ktp_c_m')?.files[0];
+                        if (fktp) promises.push(new Promise((resolve, reject) => { @this.upload('foto_ktp', fktp, resolve, reject); }));
+                        
+                        let fakta = document.getElementById('mu_foto_akta_g')?.files[0] || document.getElementById('mu_foto_akta_c')?.files[0] || document.getElementById('mu_foto_akta_g_m')?.files[0] || document.getElementById('mu_foto_akta_c_m')?.files[0];
+                        if (fakta) promises.push(new Promise((resolve, reject) => { @this.upload('foto_akta', fakta, resolve, reject); }));
+                        
+                        let fkk = document.getElementById('mu_foto_kk_g')?.files[0] || document.getElementById('mu_foto_kk_c')?.files[0] || document.getElementById('mu_foto_kk_g_m')?.files[0] || document.getElementById('mu_foto_kk_c_m')?.files[0];
+                        if (fkk) promises.push(new Promise((resolve, reject) => { @this.upload('foto_kk', fkk, resolve, reject); }));
+                        
+                        if (promises.length > 0) {
+                            $refs.submitBtn.disabled = true;
+                            $refs.submitText.classList.add('hidden');
+                            $refs.loadingText.classList.remove('hidden');
+                            
+                            Promise.all(promises).then(() => {
+                                @this.call('save');
+                                setTimeout(() => {
+                                    $refs.submitBtn.disabled = false;
+                                    $refs.submitText.classList.remove('hidden');
+                                    $refs.loadingText.classList.add('hidden');
+                                }, 2000);
+                            }).catch(() => {
+                                alert('Gagal mengunggah beberapa file gambar. Silakan coba lagi.');
                                 $refs.submitBtn.disabled = false;
                                 $refs.submitText.classList.remove('hidden');
                                 $refs.loadingText.classList.add('hidden');
-                            }, 1000);
-                        }).catch(() => {
-                            $refs.submitBtn.disabled = false;
-                            $refs.submitText.classList.remove('hidden');
-                            $refs.loadingText.classList.add('hidden');
-                        });
+                            });
+                        } else {
+                            @this.call('save');
+                        }
                     " class="p-8">
                         <div class="space-y-8 max-h-[70vh] overflow-y-auto px-4 custom-scrollbar">
                             {{-- Bagian 1: Data Personal --}}
@@ -861,12 +882,12 @@ new class extends Component {
                                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
                                     <div>
                                         <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Foto Profil</label>
-                                        <div wire:ignore class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue">
+                                        <div wire:ignore class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue" x-data="singleUpload('{{ $existing_foto_profil ? asset($existing_foto_profil) : '' }}')">
                                             <div class="absolute inset-0 w-full h-full z-0 pointer-events-none">
-                                                <img id="preview_mu_foto_profil" src="{{ $existing_foto_profil ? asset($existing_foto_profil) : '' }}" class="w-full h-full object-cover {{ $existing_foto_profil ? '' : 'hidden' }}">
+                                                <img x-show="imageUrl" :src="imageUrl" class="w-full h-full object-cover">
                                             </div>
                                             
-                                            <div id="placeholder_mu_foto_profil" class="text-center relative z-10 pointer-events-none {{ $existing_foto_profil ? 'hidden' : '' }}">
+                                            <div x-show="!imageUrl" class="text-center relative z-10 pointer-events-none">
                                                 <x-lucide-camera class="w-6 h-6 text-slate-300 mx-auto mb-2" />
                                                 <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block">Upload Foto</span>
                                             </div>
@@ -874,22 +895,22 @@ new class extends Component {
                                             <div class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 z-20">
                                                 <label class="p-2 bg-white rounded-lg cursor-pointer hover:scale-110 transition active:scale-95" title="Galeri">
                                                     <x-lucide-image class="w-4 h-4 text-slate-700" />
-                                                    <input type="file" id="mu_foto_profil_g" wire:model="foto_profil" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'preview_mu_foto_profil', 'placeholder_mu_foto_profil')">
+                                                    <input type="file" wire:model="foto_profil" class="hidden" accept=".jpg,.jpeg,.png,.webp" @change="previewImage">
                                                 </label>
                                                 <label class="p-2 bg-white rounded-lg cursor-pointer hover:scale-110 transition active:scale-95" title="Kamera">
                                                     <x-lucide-camera class="w-4 h-4 text-slate-700" />
-                                                    <input type="file" id="mu_foto_profil_c" wire:model="foto_profil" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="user" onchange="previewSingleImage(this, 'preview_mu_foto_profil', 'placeholder_mu_foto_profil')">
+                                                    <input type="file" wire:model="foto_profil" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="user" @change="previewImage">
                                                 </label>
                                             </div>
                                             {{-- Mobile View --}}
                                             <div class="absolute bottom-1 flex gap-1 md:hidden z-20">
                                                 <label class="p-1.5 bg-white/90 rounded-md shadow">
                                                     <x-lucide-image class="w-3.5 h-3.5 text-slate-600" />
-                                                    <input type="file" id="mu_foto_profil_g_m" wire:model="foto_profil" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'preview_mu_foto_profil', 'placeholder_mu_foto_profil')">
+                                                    <input type="file" wire:model="foto_profil" class="hidden" accept=".jpg,.jpeg,.png,.webp" @change="previewImage">
                                                 </label>
                                                 <label class="p-1.5 bg-white/90 rounded-md shadow">
                                                     <x-lucide-camera class="w-3.5 h-3.5 text-slate-600" />
-                                                    <input type="file" id="mu_foto_profil_c_m" wire:model="foto_profil" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="user" onchange="previewSingleImage(this, 'preview_mu_foto_profil', 'placeholder_mu_foto_profil')">
+                                                    <input type="file" wire:model="foto_profil" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="user" @change="previewImage">
                                                 </label>
                                             </div>
                                         </div>
@@ -897,12 +918,12 @@ new class extends Component {
                                     </div>
                                     <div>
                                         <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Foto KTP</label>
-                                        <div wire:ignore class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue">
+                                        <div wire:ignore class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue" x-data="singleUpload('{{ $existing_foto_ktp ? route('document.view', ['type' => 'ktp', 'filename' => basename($existing_foto_ktp) ?: 'none']) : '' }}')">
                                             <div class="absolute inset-0 w-full h-full z-0 pointer-events-none">
-                                                <img id="preview_mu_foto_ktp" src="{{ $existing_foto_ktp ? route('document.view', ['type' => 'ktp', 'filename' => basename($existing_foto_ktp) ?: 'none']) : '' }}" class="w-full h-full object-cover {{ $existing_foto_ktp ? '' : 'hidden' }}">
+                                                <img x-show="imageUrl" :src="imageUrl" class="w-full h-full object-cover">
                                             </div>
                                             
-                                            <div id="placeholder_mu_foto_ktp" class="text-center relative z-10 pointer-events-none {{ $existing_foto_ktp ? 'hidden' : '' }}">
+                                            <div x-show="!imageUrl" class="text-center relative z-10 pointer-events-none">
                                                 <x-lucide-image-plus class="w-6 h-6 text-slate-300 mx-auto mb-2" />
                                                 <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block">Upload KTP</span>
                                             </div>
@@ -910,22 +931,22 @@ new class extends Component {
                                             <div class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 z-20">
                                                 <label class="p-2 bg-white rounded-lg cursor-pointer hover:scale-110 transition active:scale-95" title="Galeri">
                                                     <x-lucide-image class="w-4 h-4 text-slate-700" />
-                                                    <input type="file" id="mu_foto_ktp_g" wire:model="foto_ktp" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'preview_mu_foto_ktp', 'placeholder_mu_foto_ktp')">
+                                                    <input type="file" wire:model="foto_ktp" class="hidden" accept=".jpg,.jpeg,.png,.webp" @change="previewImage">
                                                 </label>
                                                 <label class="p-2 bg-white rounded-lg cursor-pointer hover:scale-110 transition active:scale-95" title="Kamera">
                                                     <x-lucide-camera class="w-4 h-4 text-slate-700" />
-                                                    <input type="file" id="mu_foto_ktp_c" wire:model="foto_ktp" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" onchange="previewSingleImage(this, 'preview_mu_foto_ktp', 'placeholder_mu_foto_ktp')">
+                                                    <input type="file" wire:model="foto_ktp" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" @change="previewImage">
                                                 </label>
                                             </div>
                                             {{-- Mobile View --}}
                                             <div class="absolute bottom-1 flex gap-1 md:hidden z-20">
                                                 <label class="p-1.5 bg-white/90 rounded-md shadow">
                                                     <x-lucide-image class="w-3.5 h-3.5 text-slate-600" />
-                                                    <input type="file" id="mu_foto_ktp_g_m" wire:model="foto_ktp" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'preview_mu_foto_ktp', 'placeholder_mu_foto_ktp')">
+                                                    <input type="file" wire:model="foto_ktp" class="hidden" accept=".jpg,.jpeg,.png,.webp" @change="previewImage">
                                                 </label>
                                                 <label class="p-1.5 bg-white/90 rounded-md shadow">
                                                     <x-lucide-camera class="w-3.5 h-3.5 text-slate-600" />
-                                                    <input type="file" id="mu_foto_ktp_c_m" wire:model="foto_ktp" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" onchange="previewSingleImage(this, 'preview_mu_foto_ktp', 'placeholder_mu_foto_ktp')">
+                                                    <input type="file" wire:model="foto_ktp" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" @change="previewImage">
                                                 </label>
                                             </div>
                                         </div>
@@ -933,12 +954,12 @@ new class extends Component {
                                     </div>
                                     <div>
                                         <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Foto Akta</label>
-                                        <div wire:ignore class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue">
+                                        <div wire:ignore class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue" x-data="singleUpload('{{ $existing_foto_akta ? route('document.view', ['type' => 'akta', 'filename' => basename($existing_foto_akta) ?: 'none']) : '' }}')">
                                             <div class="absolute inset-0 w-full h-full z-0 pointer-events-none">
-                                                <img id="preview_mu_foto_akta" src="{{ $existing_foto_akta ? route('document.view', ['type' => 'akta', 'filename' => basename($existing_foto_akta) ?: 'none']) : '' }}" class="w-full h-full object-cover {{ $existing_foto_akta ? '' : 'hidden' }}">
+                                                <img x-show="imageUrl" :src="imageUrl" class="w-full h-full object-cover">
                                             </div>
                                             
-                                            <div id="placeholder_mu_foto_akta" class="text-center relative z-10 pointer-events-none {{ $existing_foto_akta ? 'hidden' : '' }}">
+                                            <div x-show="!imageUrl" class="text-center relative z-10 pointer-events-none">
                                                 <x-lucide-file-plus class="w-6 h-6 text-slate-300 mx-auto mb-2" />
                                                 <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block">Upload Akta</span>
                                             </div>
@@ -946,22 +967,22 @@ new class extends Component {
                                             <div class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 z-20">
                                                 <label class="p-2 bg-white rounded-lg cursor-pointer hover:scale-110 transition active:scale-95" title="Galeri">
                                                     <x-lucide-image class="w-4 h-4 text-slate-700" />
-                                                    <input type="file" id="mu_foto_akta_g" wire:model="foto_akta" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'preview_mu_foto_akta', 'placeholder_mu_foto_akta')">
+                                                    <input type="file" wire:model="foto_akta" class="hidden" accept=".jpg,.jpeg,.png,.webp" @change="previewImage">
                                                 </label>
                                                 <label class="p-2 bg-white rounded-lg cursor-pointer hover:scale-110 transition active:scale-95" title="Kamera">
                                                     <x-lucide-camera class="w-4 h-4 text-slate-700" />
-                                                    <input type="file" id="mu_foto_akta_c" wire:model="foto_akta" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" onchange="previewSingleImage(this, 'preview_mu_foto_akta', 'placeholder_mu_foto_akta')">
+                                                    <input type="file" wire:model="foto_akta" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" @change="previewImage">
                                                 </label>
                                             </div>
                                             {{-- Mobile View --}}
                                             <div class="absolute bottom-1 flex gap-1 md:hidden z-20">
                                                 <label class="p-1.5 bg-white/90 rounded-md shadow">
                                                     <x-lucide-image class="w-3.5 h-3.5 text-slate-600" />
-                                                    <input type="file" id="mu_foto_akta_g_m" wire:model="foto_akta" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'preview_mu_foto_akta', 'placeholder_mu_foto_akta')">
+                                                    <input type="file" wire:model="foto_akta" class="hidden" accept=".jpg,.jpeg,.png,.webp" @change="previewImage">
                                                 </label>
                                                 <label class="p-1.5 bg-white/90 rounded-md shadow">
                                                     <x-lucide-camera class="w-3.5 h-3.5 text-slate-600" />
-                                                    <input type="file" id="mu_foto_akta_c_m" wire:model="foto_akta" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" onchange="previewSingleImage(this, 'preview_mu_foto_akta', 'placeholder_mu_foto_akta')">
+                                                    <input type="file" wire:model="foto_akta" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" @change="previewImage">
                                                 </label>
                                             </div>
                                         </div>
@@ -969,12 +990,12 @@ new class extends Component {
                                     </div>
                                     <div>
                                         <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Foto KK</label>
-                                        <div wire:ignore class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue">
+                                        <div wire:ignore class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue" x-data="singleUpload('{{ $existing_foto_kk ? route('document.view', ['type' => 'kk', 'filename' => basename($existing_foto_kk) ?: 'none']) : '' }}')">
                                             <div class="absolute inset-0 w-full h-full z-0 pointer-events-none">
-                                                <img id="preview_mu_foto_kk" src="{{ $existing_foto_kk ? route('document.view', ['type' => 'kk', 'filename' => basename($existing_foto_kk) ?: 'none']) : '' }}" class="w-full h-full object-cover {{ $existing_foto_kk ? '' : 'hidden' }}">
+                                                <img x-show="imageUrl" :src="imageUrl" class="w-full h-full object-cover">
                                             </div>
                                             
-                                            <div id="placeholder_mu_foto_kk" class="text-center relative z-10 pointer-events-none {{ $existing_foto_kk ? 'hidden' : '' }}">
+                                            <div x-show="!imageUrl" class="text-center relative z-10 pointer-events-none">
                                                 <x-lucide-users class="w-6 h-6 text-slate-300 mx-auto mb-2" />
                                                 <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block">Upload KK</span>
                                             </div>
@@ -982,22 +1003,22 @@ new class extends Component {
                                             <div class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 z-20">
                                                 <label class="p-2 bg-white rounded-lg cursor-pointer hover:scale-110 transition active:scale-95" title="Galeri">
                                                     <x-lucide-image class="w-4 h-4 text-slate-700" />
-                                                    <input type="file" id="mu_foto_kk_g" wire:model="foto_kk" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'preview_mu_foto_kk', 'placeholder_mu_foto_kk')">
+                                                    <input type="file" wire:model="foto_kk" class="hidden" accept=".jpg,.jpeg,.png,.webp" @change="previewImage">
                                                 </label>
                                                 <label class="p-2 bg-white rounded-lg cursor-pointer hover:scale-110 transition active:scale-95" title="Kamera">
                                                     <x-lucide-camera class="w-4 h-4 text-slate-700" />
-                                                    <input type="file" id="mu_foto_kk_c" wire:model="foto_kk" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" onchange="previewSingleImage(this, 'preview_mu_foto_kk', 'placeholder_mu_foto_kk')">
+                                                    <input type="file" wire:model="foto_kk" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" @change="previewImage">
                                                 </label>
                                             </div>
                                             {{-- Mobile View --}}
                                             <div class="absolute bottom-1 flex gap-1 md:hidden z-20">
                                                 <label class="p-1.5 bg-white/90 rounded-md shadow">
                                                     <x-lucide-image class="w-3.5 h-3.5 text-slate-600" />
-                                                    <input type="file" id="mu_foto_kk_g_m" wire:model="foto_kk" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'preview_mu_foto_kk', 'placeholder_mu_foto_kk')">
+                                                    <input type="file" wire:model="foto_kk" class="hidden" accept=".jpg,.jpeg,.png,.webp" @change="previewImage">
                                                 </label>
                                                 <label class="p-1.5 bg-white/90 rounded-md shadow">
                                                     <x-lucide-camera class="w-3.5 h-3.5 text-slate-600" />
-                                                    <input type="file" id="mu_foto_kk_c_m" wire:model="foto_kk" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" onchange="previewSingleImage(this, 'preview_mu_foto_kk', 'placeholder_mu_foto_kk')">
+                                                    <input type="file" wire:model="foto_kk" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" @change="previewImage">
                                                 </label>
                                             </div>
                                         </div>

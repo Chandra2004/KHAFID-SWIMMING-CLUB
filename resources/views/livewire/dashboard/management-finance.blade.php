@@ -294,7 +294,8 @@ new class extends Component {
                     </button>
                 </div>
 
-                <form wire:submit.prevent="save" class="p-8">
+                <form wire:submit.prevent="save"
+                    class="p-8">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="md:col-span-2">
                             <label
@@ -342,18 +343,19 @@ new class extends Component {
                             <label
                                 class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2 ml-1 text-center">Gambar
                                 / QRIS (Optional)</label>
-                            <div class="flex items-center justify-center gap-6">
+                            <div class="flex items-center justify-center gap-6" x-data="singleUpload('{{ $existingImage ? asset($existingImage) : '' }}')">
                                 <div wire:ignore
                                     class="w-32 h-32 bg-slate-50 rounded-[2rem] overflow-hidden border-4 border-white shadow-xl flex items-center justify-center relative">
-                                    <img id="preview_mf_image" src="{{ $existingImage ? asset($existingImage) : '' }}" class="w-full h-full object-cover {{ $existingImage ? '' : 'hidden' }}">
-                                    <div id="placeholder_mf_image" class="{{ $existingImage ? 'hidden' : 'flex' }} items-center justify-center w-full h-full absolute inset-0">
+                                    <img x-show="imageUrl" :src="imageUrl" class="w-full h-full object-cover">
+                                    <div x-show="!imageUrl"
+                                        class="flex items-center justify-center w-full h-full absolute inset-0">
                                         <x-lucide-qr-code class="w-10 h-10 text-slate-300" />
                                     </div>
                                 </div>
                                 <label
                                     class="bg-emerald-600 text-white px-6 py-3 rounded-2xl shadow-xl shadow-emerald-100 cursor-pointer hover:bg-emerald-700 transition font-bold text-xs">
                                     Upload QRIS/Image
-                                    <input type="file" id="mf_image" wire:model="image" class="hidden" accept="image/*" onchange="previewSingleImage(this, 'preview_mf_image', 'placeholder_mf_image')">
+                                    <input type="file" wire:model="image" class="hidden" accept="image/*" @change="previewImage">
                                 </label>
                             </div>
                             @error('image')
@@ -381,12 +383,12 @@ new class extends Component {
                     <div class="flex items-center pt-8 mt-8 border-t border-slate-100 gap-4">
                         <button type="button" wire:click="$set('showModal', false)"
                             class="flex-1 px-6 py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold hover:bg-slate-200 transition">Batal</button>
-                        <button type="submit" x-ref="mfSubmitBtn"
+                        <button type="submit" wire:loading.attr="disabled"
                             class="flex-1 px-6 py-4 bg-emerald-600 text-white rounded-2xl font-bold hover:bg-emerald-700 transition shadow-xl shadow-emerald-100 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed">
-                            <span x-ref="mfSubmitText">
+                            <span wire:loading.remove wire:target="save, image">
                                 {{ $modalMode === 'create' ? 'Simpan Data' : 'Perbarui Data' }}
                             </span>
-                            <span x-ref="mfLoadingText" class="hidden flex items-center gap-2">
+                            <span wire:loading wire:target="save, image" class="flex items-center gap-2">
                                 <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg"
                                     fill="none" viewBox="0 0 24 24">
                                     <circle class="opacity-25" cx="12" cy="12" r="10"

@@ -78,7 +78,7 @@ new class extends Component {
                 'total_size_mb' => $totalSizeMB,
                 'usage_percent' => $usagePercentage,
                 'photo_limit' => $photoLimit,
-            ]
+            ],
         ];
     }
 
@@ -105,7 +105,17 @@ new class extends Component {
 
     public function updatedPhotos()
     {
-        // Skip default file validation for base64 arrays
+        $this->validate(
+            [
+                'photos.*' => 'image|max:5120',
+                'photos' => 'nullable|array|max:50',
+            ],
+            [
+                'photos.max' => 'Maksimal 50 foto dalam satu kali unggah.',
+                'photos.*.max' => 'Ukuran satu foto tidak boleh lebih dari 2MB.',
+                'photos.*.image' => 'File harus berupa gambar.',
+            ],
+        );
     }
 
     public function save()
@@ -264,15 +274,17 @@ new class extends Component {
                 <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Storage Usage</h4>
                 <span class="text-xs font-black text-slate-900">{{ $stats['usage_percent'] }}%</span>
             </div>
-            
+
             {{-- Progress Bar --}}
             <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden mb-4">
-                <div class="h-full bg-ksc-blue rounded-full transition-all duration-1000" style="width: {{ $stats['usage_percent'] }}%"></div>
+                <div class="h-full bg-ksc-blue rounded-full transition-all duration-1000"
+                    style="width: {{ $stats['usage_percent'] }}%"></div>
             </div>
 
             <div class="flex justify-between items-center">
                 <div class="flex items-center gap-2">
-                    <span class="text-[10px] font-black text-ksc-blue uppercase tracking-widest">{{ $stats['total_photos'] }}/{{ $stats['photo_limit'] }}</span>
+                    <span
+                        class="text-[10px] font-black text-ksc-blue uppercase tracking-widest">{{ $stats['total_photos'] }}/{{ $stats['photo_limit'] }}</span>
                     <span class="text-[10px] font-bold text-slate-300 uppercase tracking-widest">Photos</span>
                 </div>
                 <div class="text-[10px] font-black text-slate-900 uppercase tracking-widest">
@@ -405,7 +417,8 @@ new class extends Component {
                             <h3 class="text-xl font-black text-slate-900 tracking-tighter uppercase">
                                 {{ $modalMode === 'create' ? 'Tambah Album Baru' : 'Edit Album Galeri' }}
                             </h3>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Kelola detail dan koleksi foto album (Maks 50 Foto)</p>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Kelola detail dan
+                                koleksi foto album (Maks 50 Foto)</p>
                         </div>
                     </div>
                     <button wire:click="$set('showModal', false)"
@@ -415,27 +428,45 @@ new class extends Component {
                 </div>
 
                 <div class="overflow-y-auto flex-1 p-8 custom-scrollbar">
-                    <form x-data @submit.prevent="
+                    <form x-data
+                        @submit.prevent="
+                        let promises = [];
+
+                        // Upload cover image jika ada
+                        let ci = document.getElementById('mg_cover_image')?.files[0];
+                        if (ci) promises.push(new Promise((resolve, reject) => { @this.upload('cover_image', ci, resolve, reject); }));
+
+                        // Upload multiple photos jika ada
+                        const photosInput = document.getElementById('mg_photos');
+                        if (photosInput && photosInput.files.length > 0) {
+                            const filesArr = Array.from(photosInput.files);
+                            filesArr.forEach(file => {
+                                promises.push(new Promise((resolve, reject) => { @this.upload('photos[]', file, resolve, reject); }));
+                            });
+                        }
+
                         const btn = document.getElementById('mgSubmitBtn');
                         const txtEl = document.getElementById('mgSubmitText');
                         const loadEl = document.getElementById('mgSubmitLoading');
-                        
-                        btn.disabled = true;
-                        txtEl.classList.add('hidden');
-                        loadEl.classList.remove('hidden');
-                        
-                        @this.call('save').then(() => {
-                            setTimeout(() => {
+
+                        if (promises.length > 0) {
+                            btn.disabled = true;
+                            txtEl.classList.add('hidden');
+                            loadEl.classList.remove('hidden');
+                            Promise.all(promises).then(() => {
+                                @this.call('save');
+                                setTimeout(() => { btn.disabled = false; txtEl.classList.remove('hidden'); loadEl.classList.add('hidden'); }, 2000);
+                            }).catch(() => {
+                                alert('Gagal mengunggah file. Silakan coba lagi.');
                                 btn.disabled = false;
                                 txtEl.classList.remove('hidden');
                                 loadEl.classList.add('hidden');
-                            }, 1000);
-                        }).catch(() => {
-                            btn.disabled = false;
-                            txtEl.classList.remove('hidden');
-                            loadEl.classList.add('hidden');
-                        });
-                    " id="galleryForm">
+                            });
+                        } else {
+                            @this.call('save');
+                        }
+                    "
+                        id="galleryForm">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                             {{-- Info Section --}}
                             <div class="space-y-6">
@@ -486,49 +517,48 @@ new class extends Component {
 
                             {{-- Media Section --}}
                             <div class="space-y-8">
-                                 {{-- Cover Upload --}}
+                                {{-- Cover Upload --}}
                                 <div>
                                     <label
                                         class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-4 ml-1 text-center">Album
                                         Cover</label>
                                     <div class="flex flex-col items-center gap-4">
                                         <div wire:ignore
-                                            class="w-full h-40 bg-slate-50 rounded-[2rem] overflow-hidden border-4 border-white shadow-xl flex items-center justify-center relative">
-                                            <img id="preview_mg_cover" src="{{ $existingCover ? asset($existingCover) : '' }}" class="w-full h-full object-cover {{ $existingCover ? '' : 'hidden' }}">
-                                            <div id="placeholder_mg_cover" class="flex items-center justify-center w-full h-full {{ $existingCover ? 'hidden' : '' }}">
+                                            class="w-full h-40 bg-slate-50 rounded-[2rem] overflow-hidden border-4 border-white shadow-xl flex items-center justify-center relative"
+                                            x-data="singleUpload('{{ $existingCover ? asset($existingCover) : '' }}')">
+                                            
+                                            <img x-show="imageUrl" :src="imageUrl" class="w-full h-full object-cover">
+                                            
+                                            <div x-show="!imageUrl" class="flex items-center justify-center w-full h-full">
                                                 <x-lucide-image class="w-10 h-10 text-slate-300" />
                                             </div>
+                                            
+                                            <label class="absolute bottom-4 bg-slate-900 text-white px-6 py-3 rounded-2xl cursor-pointer hover:bg-slate-800 transition font-bold text-[10px] uppercase tracking-[0.2em] shadow-lg">
+                                                Ganti Sampul
+                                                <input type="file" wire:model="cover" class="hidden" accept="image/*" @change="previewImage">
+                                            </label>
                                         </div>
-                                        <label
-                                            class="bg-slate-900 text-white px-6 py-3 rounded-2xl cursor-pointer hover:bg-slate-800 transition font-bold text-[10px] uppercase tracking-[0.2em]">
-                                            Ganti Sampul
-                                            <input type="file" id="mg_cover_image" wire:model="cover_image" class="hidden"
-                                                accept="image/*" onchange="previewSingleImage(this, 'preview_mg_cover', 'placeholder_mg_cover')">
-                                        </label>
                                     </div>
                                 </div>
 
                                 {{-- Photos Upload --}}
-                                <div>
+                                <div x-data="multiUpload()">
                                     <div class="flex justify-between items-center mb-4 px-1">
                                         <div>
-                                            <label class="block text-xs font-black text-slate-400 uppercase tracking-widest">
+                                            <label
+                                                class="block text-xs font-black text-slate-400 uppercase tracking-widest">
                                                 Koleksi Foto
-                                                <span id="mgPhotosCount" class="text-indigo-600 ml-1 hidden"></span>
+                                                <span class="text-indigo-600 ml-1" x-show="images.length > 0" x-text="'(' + images.length + ' Terpilih)'"></span>
                                             </label>
-                                            <p class="text-[9px] font-bold text-slate-300 uppercase mt-1">Maksimal 50 foto per upload</p>
+                                            <p class="text-[9px] font-bold text-slate-300 uppercase mt-1">Maksimal 50
+                                                foto per upload</p>
                                         </div>
                                         <label
                                             class="text-indigo-600 font-black text-[10px] uppercase tracking-widest cursor-pointer hover:underline">
                                             + Tambah Foto
-                                            <input type="file" id="mg_photos" wire:model="photos" class="hidden"
-                                                accept="image/*" multiple onchange="
-                                                     previewMultipleImages(this, 'mg_photos_preview');
-                                                     const count = this.files.length;
-                                                     const countEl = document.getElementById('mgPhotosCount');
-                                                     if (count > 0) { countEl.textContent = '(' + count + ' Terpilih)'; countEl.classList.remove('hidden'); }
-                                                     else { countEl.classList.add('hidden'); }
-                                                 ">
+                                            <input type="file" wire:model="photos" class="hidden" accept="image/*"
+                                                multiple
+                                                @change="previewImages">
                                         </label>
                                     </div>
 
@@ -538,7 +568,8 @@ new class extends Component {
 
                                         <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                                             @foreach ($existingPhotos as $index => $photo)
-                                                <div class="relative group aspect-square rounded-xl overflow-hidden border-2 border-white shadow-sm">
+                                                <div
+                                                    class="relative group aspect-square rounded-xl overflow-hidden border-2 border-white shadow-sm">
                                                     <img src="{{ asset($photo) }}"
                                                         class="w-full h-full object-cover">
                                                     <button type="button"
@@ -548,10 +579,16 @@ new class extends Component {
                                                     </button>
                                                 </div>
                                             @endforeach
+                                            
+                                            <template x-for="(img, index) in images" :key="index">
+                                                <div class="relative group aspect-square rounded-xl overflow-hidden border-2 border-slate-200 shadow-sm opacity-70">
+                                                    <img :src="img" class="w-full h-full object-cover">
+                                                    <div class="absolute inset-0 bg-slate-900/10 flex items-center justify-center">
+                                                        <x-lucide-loader-2 class="w-5 h-5 text-white animate-spin drop-shadow-md" />
+                                                    </div>
+                                                </div>
+                                            </template>
                                         </div>
-
-                                        {{-- JS Preview Container for new photos --}}
-                                        <div id="mg_photos_preview" class="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-3 hidden"></div>
 
                                         @if (empty($existingPhotos))
                                             <div id="mgNoPhotos"
@@ -562,8 +599,14 @@ new class extends Component {
                                             </div>
                                         @endif
                                     </div>
-                                    @error('photos.*') <span class="text-[10px] text-rose-500 font-bold block mt-2 uppercase text-center">{{ $message }}</span> @enderror
-                                    @error('photos') <span class="text-[10px] text-rose-500 font-bold block mt-2 uppercase text-center">{{ $message }}</span> @enderror
+                                    @error('photos.*')
+                                        <span
+                                            class="text-[10px] text-rose-500 font-bold block mt-2 uppercase text-center">{{ $message }}</span>
+                                    @enderror
+                                    @error('photos')
+                                        <span
+                                            class="text-[10px] text-rose-500 font-bold block mt-2 uppercase text-center">{{ $message }}</span>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
@@ -579,9 +622,13 @@ new class extends Component {
                             {{ $modalMode === 'create' ? 'Simpan Album' : 'Perbarui Album' }}
                         </span>
                         <span id="mgSubmitLoading" class="hidden flex items-center gap-2">
-                            <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg"
+                                fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10"
+                                    stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                </path>
                             </svg>
                             <span>Memproses...</span>
                         </span>
@@ -592,19 +639,23 @@ new class extends Component {
     @endif
 
     {{-- Modal Delete Confirmation --}}
-    @if($showDeleteModal)
+    @if ($showDeleteModal)
         <div class="fixed inset-0 z-[2000] overflow-y-auto px-4 py-6 sm:px-0 flex items-center justify-center">
             <div class="fixed inset-0 transform transition-all" wire:click="$set('showModal', false)">
                 <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
             </div>
 
-            <div class="bg-white rounded-[2.5rem] overflow-hidden shadow-2xl transform transition-all sm:w-full sm:max-w-2xl z-[2010] border border-slate-100">
+            <div
+                class="bg-white rounded-[2.5rem] overflow-hidden shadow-2xl transform transition-all sm:w-full sm:max-w-2xl z-[2010] border border-slate-100">
                 <div class="p-12 text-center">
-                    <div class="w-20 h-20 bg-rose-50 rounded-[2.5rem] flex items-center justify-center mx-auto mb-8 shadow-xl shadow-rose-100">
+                    <div
+                        class="w-20 h-20 bg-rose-50 rounded-[2.5rem] flex items-center justify-center mx-auto mb-8 shadow-xl shadow-rose-100">
                         <x-lucide-trash-2 class="w-10 h-10 text-rose-600" />
                     </div>
                     <h3 class="text-2xl font-black text-slate-900 tracking-tighter uppercase mb-4">Hapus Album?</h3>
-                    <p class="text-slate-500 font-medium mb-10 px-10">Seluruh foto di dalam album <span class="text-rose-600 font-black">"{{ $galleryToDelete?->title }}"</span> akan dihapus permanen dari server.</p>
+                    <p class="text-slate-500 font-medium mb-10 px-10">Seluruh foto di dalam album <span
+                            class="text-rose-600 font-black">"{{ $galleryToDelete?->title }}"</span> akan dihapus
+                        permanen dari server.</p>
                     <div class="flex flex-col sm:flex-row gap-4 justify-center">
                         <button wire:click="$set('showDeleteModal', false)"
                             class="px-8 py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold hover:bg-slate-200 transition uppercase text-[10px] tracking-widest">Batal</button>
@@ -612,9 +663,13 @@ new class extends Component {
                             class="px-8 py-4 bg-rose-600 text-white rounded-2xl font-bold hover:bg-rose-700 transition shadow-xl shadow-rose-200 flex items-center justify-center gap-2 min-w-[160px] uppercase text-[10px] tracking-widest">
                             <span wire:loading.remove wire:target="delete">Ya, Hapus Album</span>
                             <span wire:loading wire:target="delete" class="flex items-center gap-2">
-                                <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg"
+                                    fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10"
+                                        stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor"
+                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                    </path>
                                 </svg>
                                 <span>Memproses...</span>
                             </span>

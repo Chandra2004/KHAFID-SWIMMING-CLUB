@@ -23,7 +23,7 @@ class EventDetail extends Component
     public $user;
     public $profileCompletion;
     public $registeredCategoryUids = [];
-    
+
     // Properties to MATCH DASHBOARD (management-pendaftaran.blade.php)
     public $showCreateModal = false;
     public $create_user_uids = [];
@@ -75,9 +75,11 @@ class EventDetail extends Component
                 ->where('status', '!=', 'rejected')
                 ->pluck('event_category_uid')
                 ->toArray();
-            
+
             $this->create_user_uids = [$user->uid];
-            $this->user = \App\Models\User::with('profile')->where('uid', $user->uid)->first();
+            /** @var \App\Models\User $userModel */
+            $userModel = clone $user;
+            $this->user = $userModel->load('profile');
         }
 
         $this->event = [
@@ -96,7 +98,7 @@ class EventDetail extends Component
             'rekening' => $eventModel->financeAccount->account_number ?? null,
             'atas_nama' => $eventModel->financeAccount->account_name ?? null,
             'qr_code' => $eventModel->financeAccount->image ?? null,
-            'total_quota' => $eventModel->categories->sum(fn($cat) => (int)$eventModel->lane_count * (int)$cat->total_series),
+            'total_quota' => collect($eventModel->categories)->map(fn($cat) => (int)$eventModel->lane_count * (int)$cat->total_series)->sum(),
             'eventCategories' => $eventModel->categories->map(function($cat) {
                 return [
                     'uid' => $cat->uid,
@@ -210,7 +212,7 @@ class EventDetail extends Component
             case '>=': return $userValue >= $targetValue;
             case '<=': return $userValue <= $targetValue;
             case 'in':
-            case 'IN': 
+            case 'IN':
                 $targets = is_array($targetValue) ? $targetValue : explode(',', $targetValue);
                 return in_array($userValue, array_map('trim', $targets));
             default: return false;
@@ -349,10 +351,10 @@ class EventDetail extends Component
                 }
 
                 $invoiceService = app(\App\Services\InvoiceService::class);
-                
+
                 $invoice = \App\Models\Invoice::create([
                     'registration_uids' => $regUids,
-                    'payment_id' => $activePayment?->uid,
+                    'payment_id' => $activePayment ? $activePayment->uid : null,
                     'amount' => $totalAmount,
                     'status' => 'draft',
                 ]);
@@ -360,17 +362,17 @@ class EventDetail extends Component
                 $invoice = $invoiceService->issue($invoice);
 
                 $this->dispatch('open-invoice-url', url: route('invoice.download', [
-                    'invoice' => $invoice->id, 
+                    'invoice' => $invoice->id,
                     'invoice_number' => $invoice->invoice_number
                 ]));
             }
             DB::commit();
             $this->dispatch('notification', [
-                'status' => 'success', 
+                'status' => 'success',
                 'message' => 'Pendaftaran Berhasil Dikirim!',
                 'duration' => 20000,
                 'invoice_url' => isset($invoice) ? route('invoice.download', [
-                    'invoice' => $invoice->id, 
+                    'invoice' => $invoice->id,
                     'invoice_number' => $invoice->invoice_number
                 ]) : null
             ]);
@@ -378,7 +380,7 @@ class EventDetail extends Component
             $this->loadData();
             $this->create_event_categories = [];
             $this->create_payment_proof = null;
-            
+
             // Dispatch a reload event after a short delay so the new tab can open first
             $this->dispatch('reload-page');
         } catch (\Exception $e) {
@@ -411,7 +413,7 @@ class EventDetail extends Component
                     });
             });
         }
-        
+
         $availableUsers = [];
         $authUser = \Illuminate\Support\Facades\Auth::user();
         if ($authUser instanceof \App\Models\User && $authUser->can('master-pendaftaran.create')) {
@@ -423,6 +425,7 @@ class EventDetail extends Component
             'availableCategories' => $availableCategories,
             'availableUsers' => $availableUsers
         ]);
+        
         return $view->layout('layouts.layout-homepage.app', ['title' => "KSC - " . $this->event['nama_event']]);
     }
 }

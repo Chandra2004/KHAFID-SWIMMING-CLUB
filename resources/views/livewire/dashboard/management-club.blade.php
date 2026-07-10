@@ -231,7 +231,8 @@ new class extends Component {
                             <td class="px-8 py-6">
                                 <div class="flex justify-center gap-2">
                                     @can('clubs.edit')
-                                        <button wire:click="openEditModal('{{ $club->uid }}')" wire:loading.attr="disabled" wire:target="openEditModal"
+                                        <button wire:click="openEditModal('{{ $club->uid }}')"
+                                            wire:loading.attr="disabled" wire:target="openEditModal"
                                             class="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-ksc-blue hover:bg-blue-50 rounded-xl transition">
                                             <x-lucide-pencil class="w-5 h-5" />
                                         </button>
@@ -287,21 +288,22 @@ new class extends Component {
                     </button>
                 </div>
 
-                <form wire:submit.prevent="save" class="p-8">
+                <form wire:submit.prevent="save"
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="md:col-span-2 flex justify-center mb-4">
-                            <div class="relative group">
+                            <div class="relative group" x-data="singleUpload('{{ $existingLogo ? asset($existingLogo) : '' }}')">
                                 <div wire:ignore
                                     class="w-32 h-32 bg-slate-50 rounded-[2rem] overflow-hidden border-4 border-white shadow-xl flex items-center justify-center relative">
-                                    <img id="preview_mc_logo" src="{{ $existingLogo ? asset($existingLogo) : '' }}" class="w-full h-full object-cover {{ $existingLogo ? '' : 'hidden' }}">
-                                    <div id="placeholder_mc_logo" class="{{ $existingLogo ? 'hidden' : '' }} flex items-center justify-center w-full h-full absolute inset-0">
+                                    <img x-show="imageUrl" :src="imageUrl" class="w-full h-full object-cover">
+                                    <div x-show="!imageUrl"
+                                        class="flex items-center justify-center w-full h-full absolute inset-0">
                                         <x-lucide-image class="w-10 h-10 text-slate-300" />
                                     </div>
                                 </div>
                                 <label
                                     class="absolute -bottom-2 -right-2 bg-ksc-blue text-white p-3 rounded-2xl shadow-xl cursor-pointer hover:bg-blue-700 transition">
                                     <x-lucide-camera class="w-5 h-5" />
-                                    <input type="file" id="mc_logo" wire:model="logo" class="hidden" accept="image/*" onchange="previewSingleImage(this, 'preview_mc_logo', 'placeholder_mc_logo')">
+                                    <input type="file" wire:model="logo" class="hidden" accept="image/*" @change="previewImage">
                                 </label>
                             </div>
                         </div>
@@ -381,15 +383,19 @@ new class extends Component {
                     <div class="flex items-center pt-8 mt-8 border-t border-slate-100 gap-4">
                         <button type="button" wire:click="$set('showModal', false)"
                             class="flex-1 px-6 py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold hover:bg-slate-200 transition">Batal</button>
-                        <button type="submit" x-ref="mcSubmitBtn"
+                        <button type="submit" wire:loading.attr="disabled"
                             class="flex-1 px-6 py-4 bg-ksc-blue text-white rounded-2xl font-bold hover:bg-blue-700 transition shadow-xl shadow-blue-100 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed">
-                            <span x-ref="mcSubmitText">
+                            <span wire:loading.remove wire:target="save, logo">
                                 {{ $modalMode === 'create' ? 'Simpan Klub' : 'Perbarui Informasi' }}
                             </span>
-                            <span x-ref="mcLoadingText" class="hidden flex items-center gap-2">
-                                <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            <span wire:loading wire:target="save, logo" class="flex items-center gap-2">
+                                <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg"
+                                    fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10"
+                                        stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor"
+                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                    </path>
                                 </svg>
                                 <span>Memproses...</span>
                             </span>
@@ -415,8 +421,9 @@ new class extends Component {
                         <x-lucide-alert-circle class="w-10 h-10 text-rose-600" />
                     </div>
                     <h3 class="text-2xl font-black text-slate-900 tracking-tighter uppercase mb-4">Hapus Klub?</h3>
-                    <p class="text-slate-500 font-medium mb-10 px-10 leading-relaxed uppercase text-[10px] tracking-widest text-center">Klub <span
-                            class="text-rose-600 font-black">"{{ $clubToDelete?->name }}"</span>
+                    <p
+                        class="text-slate-500 font-medium mb-10 px-10 leading-relaxed uppercase text-[10px] tracking-widest text-center">
+                        Klub <span class="text-rose-600 font-black">"{{ $clubToDelete?->name }}"</span>
                         akan dihapus permanen dari sistem.</p>
                     <div class="flex flex-col sm:flex-row gap-4 justify-center">
                         <button wire:click="$set('showDeleteModal', false)"
@@ -427,8 +434,8 @@ new class extends Component {
                             <span wire:loading wire:target="delete" class="flex items-center gap-2">
                                 <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg"
                                     fill="none" viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
-                                        stroke-width="4"></circle>
+                                    <circle class="opacity-25" cx="12" cy="12" r="10"
+                                        stroke="currentColor" stroke-width="4"></circle>
                                     <path class="opacity-75" fill="currentColor"
                                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
                                     </path>

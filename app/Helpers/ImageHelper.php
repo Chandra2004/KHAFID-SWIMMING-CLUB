@@ -25,17 +25,17 @@ class ImageHelper
             }
         }
 
-        // Penentuan folder: Dokumen sensitif masuk ke storage/app (aman), 
+        // Penentuan folder: Dokumen sensitif masuk ke storage/app (aman),
         // Foto profil masuk ke public/uploads (akses cepat).
         $targetDir = 'uploads/' . $folder;
         $sensitiveFolders = ['ktp_documents', 'akta_documents', 'kk_documents'];
-        
+
         if (in_array($folder, $sensitiveFolders)) {
             $uploadPath = storage_path('app/' . $targetDir);
         } else {
             $uploadPath = public_path($targetDir);
         }
-        
+
         if (!file_exists($uploadPath)) {
             mkdir($uploadPath, 0777, true);
         }
@@ -44,45 +44,30 @@ class ImageHelper
         $filename = time() . '_' . uniqid() . '.webp';
         $fullPath = $uploadPath . '/' . $filename;
 
-        $image = null;
-        if (is_string($file) && str_starts_with($file, 'data:image/')) {
-            try {
-                if (preg_match('/^data:image\/(\w+);base64,/', $file, $type)) {
-                    $data = base64_decode(substr($file, strpos($file, ',') + 1));
-                    if ($data === false) return null;
-                    $image = @imagecreatefromstring($data);
-                } else {
-                    return null;
-                }
-            } catch (\Exception $e) {
-                return null;
-            }
-        } else {
-            // Ambil info mime-type dengan peredam error (@)
-            $imageInfo = @getimagesize($file->getRealPath());
-            
-            if (!$imageInfo) {
-                return null; // File bukan gambar yang valid
-            }
-            
-            $mime = $imageInfo['mime'];
+        // Ambil info mime-type dengan peredam error (@)
+        $imageInfo = @getimagesize($file->getRealPath());
 
-            // Buat resource gambar berdasarkan tipe asli
-            try {
-                switch ($mime) {
-                    case 'image/jpeg': $image = @imagecreatefromjpeg($file->getRealPath()); break;
-                    case 'image/png':  $image = @imagecreatefrompng($file->getRealPath()); break;
-                    case 'image/webp': $image = @imagecreatefromwebp($file->getRealPath()); break;
-                    case 'image/gif':  $image = @imagecreatefromgif($file->getRealPath()); break;
-                    default: return null;
-                }
-            } catch (\Exception $e) {
-                return null;
+        if (!$imageInfo) {
+            return null; // File bukan gambar yang valid
+        }
+
+        $mime = $imageInfo['mime'];
+
+        // Buat resource gambar berdasarkan tipe asli
+        try {
+            switch ($mime) {
+                case 'image/jpeg': $image = @imagecreatefromjpeg($file->getRealPath()); break;
+                case 'image/png':  $image = @imagecreatefrompng($file->getRealPath()); break;
+                case 'image/webp': $image = @imagecreatefromwebp($file->getRealPath()); break;
+                case 'image/gif':  $image = @imagecreatefromgif($file->getRealPath()); break;
+                default: return null;
             }
+        } catch (\Exception $e) {
+            return null;
         }
 
         if (!$image) return null;
-        
+
         // --- AUTO RESIZE LOGIC ---
         $maxWidth = 1920;
         $maxHeight = 1920;
@@ -102,11 +87,11 @@ class ImageHelper
             }
 
             $resizedImage = imagecreatetruecolor($newWidth, $newHeight);
-            
+
             // Pertahankan transparansi untuk hasil resize
             imagealphablending($resizedImage, false);
             imagesavealpha($resizedImage, true);
-            
+
             imagecopyresampled($resizedImage, $image, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
             imagedestroy($image);
             $image = $resizedImage;
