@@ -78,10 +78,10 @@ new class extends Component {
             'alamat_lengkap' => 'required|string',
             'club_uid' => 'required|string',
             'custom_club_name' => 'required_if:club_uid,other|max:255',
-            'foto_profil' => ($this->profile->profile_picture ? 'nullable' : 'required') . '|image|mimes:jpeg,jpg,png,webp|max:5120',
-            'foto_ktp' => ($this->profile->identity_photo ? 'nullable' : 'required') . '|image|mimes:jpeg,jpg,png,webp|max:5120',
-            'foto_akta' => ($this->profile->birth_certificate_photo ? 'nullable' : 'required') . '|image|mimes:jpeg,jpg,png,webp|max:5120',
-            'foto_kk' => ($this->profile->family_card_photo ? 'nullable' : 'required') . '|image|mimes:jpeg,jpg,png,webp|max:5120',
+            'foto_profil' => ($this->profile->profile_picture ? 'nullable' : 'required') . '|string',
+            'foto_ktp' => ($this->profile->identity_photo ? 'nullable' : 'required') . '|string',
+            'foto_akta' => ($this->profile->birth_certificate_photo ? 'nullable' : 'required') . '|string',
+            'foto_kk' => ($this->profile->family_card_photo ? 'nullable' : 'required') . '|string',
             'password' => 'nullable|min:8',
         ];
     }
@@ -272,31 +272,20 @@ new class extends Component {
         </div>
 
         <form @submit.prevent="
-            let promises = [];
-            let fp = document.getElementById('mp_foto_profil_galeri')?.files[0] || document.getElementById('mp_foto_profil_kamera')?.files[0];
-            let fk = document.getElementById('mp_foto_ktp_galeri')?.files[0] || document.getElementById('mp_foto_ktp_kamera')?.files[0];
-            let fa = document.getElementById('mp_foto_akta_galeri')?.files[0] || document.getElementById('mp_foto_akta_kamera')?.files[0];
-            let fkk = document.getElementById('mp_foto_kk_galeri')?.files[0] || document.getElementById('mp_foto_kk_kamera')?.files[0];
-            if (fp) promises.push(new Promise((res, rej) => { @this.upload('foto_profil', fp, res, rej); }));
-            if (fk) promises.push(new Promise((res, rej) => { @this.upload('foto_ktp', fk, res, rej); }));
-            if (fa) promises.push(new Promise((res, rej) => { @this.upload('foto_akta', fa, res, rej); }));
-            if (fkk) promises.push(new Promise((res, rej) => { @this.upload('foto_kk', fkk, res, rej); }));
-            if (promises.length > 0) {
-                $refs.mpSaveBtn.disabled = true;
-                $refs.mpSaveText.classList.add('hidden');
-                $refs.mpLoadingText.classList.remove('hidden');
-                Promise.all(promises).then(() => {
-                    @this.call('save');
-                    setTimeout(() => { $refs.mpSaveBtn.disabled = false; $refs.mpSaveText.classList.remove('hidden'); $refs.mpLoadingText.classList.add('hidden'); }, 2000);
-                }).catch(() => {
-                    alert('Gagal mengunggah file. Silakan coba lagi.');
+            $refs.mpSaveBtn.disabled = true;
+            $refs.mpSaveText.classList.add('hidden');
+            $refs.mpLoadingText.classList.remove('hidden');
+            @this.call('save').then(() => {
+                setTimeout(() => {
                     $refs.mpSaveBtn.disabled = false;
                     $refs.mpSaveText.classList.remove('hidden');
                     $refs.mpLoadingText.classList.add('hidden');
-                });
-            } else {
-                @this.call('save');
-            }
+                }, 1000);
+            }).catch(() => {
+                $refs.mpSaveBtn.disabled = false;
+                $refs.mpSaveText.classList.remove('hidden');
+                $refs.mpLoadingText.classList.add('hidden');
+            });
         " class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div class="space-y-6">
                 {{-- Foto Profil --}}
@@ -310,11 +299,11 @@ new class extends Component {
                             <div class="absolute -bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
                                 <label class="bg-white border border-slate-200 p-3 rounded-2xl shadow-xl hover:text-blue-600 transition-all active:scale-95 cursor-pointer group/btn" title="Ambil dari Galeri">
                                     <x-lucide-image class="w-5 h-5 text-slate-500 group-hover/btn:text-blue-600" />
-                                    <input type="file" id="mp_foto_profil_galeri" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'mp_preview_foto_profil'); document.getElementById('mp_foto_profil_kamera').value='';">
+                                    <input type="file" id="mp_foto_profil_galeri" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'mp_preview_foto_profil'); readAndSetBase64(this, base64 => @this.set('foto_profil', base64)); document.getElementById('mp_foto_profil_kamera').value='';">
                                 </label>
                                 <label class="bg-white border border-slate-200 p-3 rounded-2xl shadow-xl hover:text-emerald-600 transition-all active:scale-95 cursor-pointer group/btn" title="Buka Kamera">
                                     <x-lucide-camera class="w-5 h-5 text-slate-500 group-hover/btn:text-emerald-600" />
-                                    <input type="file" id="mp_foto_profil_kamera" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="user" onchange="previewSingleImage(this, 'mp_preview_foto_profil'); document.getElementById('mp_foto_profil_galeri').value='';">
+                                    <input type="file" id="mp_foto_profil_kamera" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="user" onchange="previewSingleImage(this, 'mp_preview_foto_profil'); readAndSetBase64(this, base64 => @this.set('foto_profil', base64)); document.getElementById('mp_foto_profil_galeri').value='';">
                                 </label>
                             </div>
                         @endcan
@@ -345,22 +334,22 @@ new class extends Component {
                                 <div class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
                                     <label class="p-3 bg-white rounded-xl cursor-pointer hover:scale-110 transition active:scale-95" title="Galeri">
                                         <x-lucide-image class="w-5 h-5 text-slate-700" />
-                                        <input type="file" id="mp_foto_ktp_galeri" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'mp_preview_foto_ktp', 'mp_placeholder_ktp'); document.getElementById('mp_foto_ktp_kamera').value='';">
+                                        <input type="file" id="mp_foto_ktp_galeri" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'mp_preview_foto_ktp', 'mp_placeholder_ktp'); readAndSetBase64(this, base64 => @this.set('foto_ktp', base64)); document.getElementById('mp_foto_ktp_kamera').value='';">
                                     </label>
                                     <label class="p-3 bg-white rounded-xl cursor-pointer hover:scale-110 transition active:scale-95" title="Kamera">
                                         <x-lucide-camera class="w-5 h-5 text-slate-700" />
-                                        <input type="file" id="mp_foto_ktp_kamera" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" onchange="previewSingleImage(this, 'mp_preview_foto_ktp', 'mp_placeholder_ktp'); document.getElementById('mp_foto_ktp_galeri').value='';">
+                                        <input type="file" id="mp_foto_ktp_kamera" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" onchange="previewSingleImage(this, 'mp_preview_foto_ktp', 'mp_placeholder_ktp'); readAndSetBase64(this, base64 => @this.set('foto_ktp', base64)); document.getElementById('mp_foto_ktp_galeri').value='';">
                                     </label>
                                 </div>
                                 {{-- Mobile View Buttons --}}
                                 <div class="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-2 md:hidden">
                                     <label class="p-2 bg-white/90 backdrop-blur rounded-lg shadow-lg border border-slate-200">
                                         <x-lucide-image class="w-4 h-4 text-slate-600" />
-                                        <input type="file" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'mp_preview_foto_ktp', 'mp_placeholder_ktp'); document.getElementById('mp_foto_ktp_galeri').files = this.files;">
+                                        <input type="file" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'mp_preview_foto_ktp', 'mp_placeholder_ktp'); readAndSetBase64(this, base64 => @this.set('foto_ktp', base64)); document.getElementById('mp_foto_ktp_galeri').files = this.files;">
                                     </label>
                                     <label class="p-2 bg-white/90 backdrop-blur rounded-lg shadow-lg border border-slate-200">
                                         <x-lucide-camera class="w-4 h-4 text-slate-600" />
-                                        <input type="file" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" onchange="previewSingleImage(this, 'mp_preview_foto_ktp', 'mp_placeholder_ktp'); document.getElementById('mp_foto_ktp_galeri').files = this.files;">
+                                        <input type="file" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" onchange="previewSingleImage(this, 'mp_preview_foto_ktp', 'mp_placeholder_ktp'); readAndSetBase64(this, base64 => @this.set('foto_ktp', base64)); document.getElementById('mp_foto_ktp_galeri').files = this.files;">
                                     </label>
                                 </div>
                             @endcan
@@ -386,22 +375,22 @@ new class extends Component {
                                 <div class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
                                     <label class="p-3 bg-white rounded-xl cursor-pointer hover:scale-110 transition active:scale-95" title="Galeri">
                                         <x-lucide-image class="w-5 h-5 text-slate-700" />
-                                        <input type="file" id="mp_foto_akta_galeri" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'mp_preview_foto_akta', 'mp_placeholder_akta'); document.getElementById('mp_foto_akta_kamera').value='';">
+                                        <input type="file" id="mp_foto_akta_galeri" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'mp_preview_foto_akta', 'mp_placeholder_akta'); readAndSetBase64(this, base64 => @this.set('foto_akta', base64)); document.getElementById('mp_foto_akta_kamera').value='';">
                                     </label>
                                     <label class="p-3 bg-white rounded-xl cursor-pointer hover:scale-110 transition active:scale-95" title="Kamera">
                                         <x-lucide-camera class="w-5 h-5 text-slate-700" />
-                                        <input type="file" id="mp_foto_akta_kamera" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" onchange="previewSingleImage(this, 'mp_preview_foto_akta', 'mp_placeholder_akta'); document.getElementById('mp_foto_akta_galeri').value='';">
+                                        <input type="file" id="mp_foto_akta_kamera" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" onchange="previewSingleImage(this, 'mp_preview_foto_akta', 'mp_placeholder_akta'); readAndSetBase64(this, base64 => @this.set('foto_akta', base64)); document.getElementById('mp_foto_akta_galeri').value='';">
                                     </label>
                                 </div>
                                 {{-- Mobile View Buttons --}}
                                 <div class="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-2 md:hidden">
                                     <label class="p-2 bg-white/90 backdrop-blur rounded-lg shadow-lg border border-slate-200">
                                         <x-lucide-image class="w-4 h-4 text-slate-600" />
-                                        <input type="file" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'mp_preview_foto_akta', 'mp_placeholder_akta'); document.getElementById('mp_foto_akta_galeri').files = this.files;">
+                                        <input type="file" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'mp_preview_foto_akta', 'mp_placeholder_akta'); readAndSetBase64(this, base64 => @this.set('foto_akta', base64)); document.getElementById('mp_foto_akta_galeri').files = this.files;">
                                     </label>
                                     <label class="p-2 bg-white/90 backdrop-blur rounded-lg shadow-lg border border-slate-200">
                                         <x-lucide-camera class="w-4 h-4 text-slate-600" />
-                                        <input type="file" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" onchange="previewSingleImage(this, 'mp_preview_foto_akta', 'mp_placeholder_akta'); document.getElementById('mp_foto_akta_galeri').files = this.files;">
+                                        <input type="file" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" onchange="previewSingleImage(this, 'mp_preview_foto_akta', 'mp_placeholder_akta'); readAndSetBase64(this, base64 => @this.set('foto_akta', base64)); document.getElementById('mp_foto_akta_galeri').files = this.files;">
                                     </label>
                                 </div>
                             @endcan
@@ -427,22 +416,22 @@ new class extends Component {
                                 <div class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
                                     <label class="p-3 bg-white rounded-xl cursor-pointer hover:scale-110 transition active:scale-95" title="Galeri">
                                         <x-lucide-image class="w-5 h-5 text-slate-700" />
-                                        <input type="file" id="mp_foto_kk_galeri" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'mp_preview_foto_kk', 'mp_placeholder_kk'); document.getElementById('mp_foto_kk_kamera').value='';">
+                                        <input type="file" id="mp_foto_kk_galeri" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'mp_preview_foto_kk', 'mp_placeholder_kk'); readAndSetBase64(this, base64 => @this.set('foto_kk', base64)); document.getElementById('mp_foto_kk_kamera').value='';">
                                     </label>
                                     <label class="p-3 bg-white rounded-xl cursor-pointer hover:scale-110 transition active:scale-95" title="Kamera">
                                         <x-lucide-camera class="w-5 h-5 text-slate-700" />
-                                        <input type="file" id="mp_foto_kk_kamera" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" onchange="previewSingleImage(this, 'mp_preview_foto_kk', 'mp_placeholder_kk'); document.getElementById('mp_foto_kk_galeri').value='';">
+                                        <input type="file" id="mp_foto_kk_kamera" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" onchange="previewSingleImage(this, 'mp_preview_foto_kk', 'mp_placeholder_kk'); readAndSetBase64(this, base64 => @this.set('foto_kk', base64)); document.getElementById('mp_foto_kk_galeri').value='';">
                                     </label>
                                 </div>
                                 {{-- Mobile View Buttons --}}
                                 <div class="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-2 md:hidden">
                                     <label class="p-2 bg-white/90 backdrop-blur rounded-lg shadow-lg border border-slate-200">
                                         <x-lucide-image class="w-4 h-4 text-slate-600" />
-                                        <input type="file" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'mp_preview_foto_kk', 'mp_placeholder_kk'); document.getElementById('mp_foto_kk_galeri').files = this.files;">
+                                        <input type="file" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'mp_preview_foto_kk', 'mp_placeholder_kk'); readAndSetBase64(this, base64 => @this.set('foto_kk', base64)); document.getElementById('mp_foto_kk_galeri').files = this.files;">
                                     </label>
                                     <label class="p-2 bg-white/90 backdrop-blur rounded-lg shadow-lg border border-slate-200">
                                         <x-lucide-camera class="w-4 h-4 text-slate-600" />
-                                        <input type="file" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" onchange="previewSingleImage(this, 'mp_preview_foto_kk', 'mp_placeholder_kk'); document.getElementById('mp_foto_kk_galeri').files = this.files;">
+                                        <input type="file" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" onchange="previewSingleImage(this, 'mp_preview_foto_kk', 'mp_placeholder_kk'); readAndSetBase64(this, base64 => @this.set('foto_kk', base64)); document.getElementById('mp_foto_kk_galeri').files = this.files;">
                                     </label>
                                 </div>
                             @endcan

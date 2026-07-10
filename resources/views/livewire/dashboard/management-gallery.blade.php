@@ -105,17 +105,7 @@ new class extends Component {
 
     public function updatedPhotos()
     {
-        $this->validate(
-            [
-                'photos.*' => 'image|max:5120',
-                'photos' => 'nullable|array|max:50',
-            ],
-            [
-                'photos.max' => 'Maksimal 50 foto dalam satu kali unggah.',
-                'photos.*.max' => 'Ukuran satu foto tidak boleh lebih dari 2MB.',
-                'photos.*.image' => 'File harus berupa gambar.',
-            ],
-        );
+        // Skip default file validation for base64 arrays
     }
 
     public function save()
@@ -126,8 +116,8 @@ new class extends Component {
             'title' => 'required|string|max:255',
             'event_uid' => 'nullable|exists:events,uid',
             'description' => 'nullable|string',
-            'cover_image' => 'nullable|image|max:5120',
-            'photos.*' => 'image|max:5120',
+            'cover_image' => 'nullable|string',
+            'photos.*' => 'string',
             'photos' => 'nullable|array|max:50',
             'is_active' => 'boolean',
         ]);
@@ -426,41 +416,25 @@ new class extends Component {
 
                 <div class="overflow-y-auto flex-1 p-8 custom-scrollbar">
                     <form x-data @submit.prevent="
-                        let promises = [];
-                        
-                        // Upload cover image jika ada
-                        let ci = document.getElementById('mg_cover_image')?.files[0];
-                        if (ci) promises.push(new Promise((resolve, reject) => { @this.upload('cover_image', ci, resolve, reject); }));
-                        
-                        // Upload multiple photos jika ada
-                        const photosInput = document.getElementById('mg_photos');
-                        if (photosInput && photosInput.files.length > 0) {
-                            const filesArr = Array.from(photosInput.files);
-                            filesArr.forEach(file => {
-                                promises.push(new Promise((resolve, reject) => { @this.upload('photos[]', file, resolve, reject); }));
-                            });
-                        }
-                        
                         const btn = document.getElementById('mgSubmitBtn');
                         const txtEl = document.getElementById('mgSubmitText');
                         const loadEl = document.getElementById('mgSubmitLoading');
                         
-                        if (promises.length > 0) {
-                            btn.disabled = true;
-                            txtEl.classList.add('hidden');
-                            loadEl.classList.remove('hidden');
-                            Promise.all(promises).then(() => {
-                                @this.call('save');
-                                setTimeout(() => { btn.disabled = false; txtEl.classList.remove('hidden'); loadEl.classList.add('hidden'); }, 2000);
-                            }).catch(() => {
-                                alert('Gagal mengunggah file. Silakan coba lagi.');
+                        btn.disabled = true;
+                        txtEl.classList.add('hidden');
+                        loadEl.classList.remove('hidden');
+                        
+                        @this.call('save').then(() => {
+                            setTimeout(() => {
                                 btn.disabled = false;
                                 txtEl.classList.remove('hidden');
                                 loadEl.classList.add('hidden');
-                            });
-                        } else {
-                            @this.call('save');
-                        }
+                            }, 1000);
+                        }).catch(() => {
+                            btn.disabled = false;
+                            txtEl.classList.remove('hidden');
+                            loadEl.classList.add('hidden');
+                        });
                     " id="galleryForm">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                             {{-- Info Section --}}
@@ -529,7 +503,7 @@ new class extends Component {
                                             class="bg-slate-900 text-white px-6 py-3 rounded-2xl cursor-pointer hover:bg-slate-800 transition font-bold text-[10px] uppercase tracking-[0.2em]">
                                             Ganti Sampul
                                             <input type="file" id="mg_cover_image" class="hidden"
-                                                accept="image/*" onchange="previewSingleImage(this, 'preview_mg_cover', 'placeholder_mg_cover')">
+                                                accept="image/*" onchange="previewSingleImage(this, 'preview_mg_cover', 'placeholder_mg_cover'); readAndSetBase64(this, base64 => @this.set('cover_image', base64))">
                                         </label>
                                     </div>
                                 </div>
@@ -549,12 +523,13 @@ new class extends Component {
                                             + Tambah Foto
                                             <input type="file" id="mg_photos" class="hidden"
                                                 accept="image/*" multiple onchange="
-                                                    previewMultipleImages(this, 'mg_photos_preview');
-                                                    const count = this.files.length;
-                                                    const countEl = document.getElementById('mgPhotosCount');
-                                                    if (count > 0) { countEl.textContent = '(' + count + ' Terpilih)'; countEl.classList.remove('hidden'); }
-                                                    else { countEl.classList.add('hidden'); }
-                                                ">
+                                                     previewMultipleImages(this, 'mg_photos_preview');
+                                                     const count = this.files.length;
+                                                     const countEl = document.getElementById('mgPhotosCount');
+                                                     if (count > 0) { countEl.textContent = '(' + count + ' Terpilih)'; countEl.classList.remove('hidden'); }
+                                                     else { countEl.classList.add('hidden'); }
+                                                     readMultipleAndSetBase64(this, base64Array => @this.set('photos', base64Array));
+                                                 ">
                                         </label>
                                     </div>
 

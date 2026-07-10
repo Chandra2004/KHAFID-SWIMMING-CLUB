@@ -44,26 +44,41 @@ class ImageHelper
         $filename = time() . '_' . uniqid() . '.webp';
         $fullPath = $uploadPath . '/' . $filename;
 
-        // Ambil info mime-type dengan peredam error (@)
-        $imageInfo = @getimagesize($file->getRealPath());
-        
-        if (!$imageInfo) {
-            return null; // File bukan gambar yang valid
-        }
-        
-        $mime = $imageInfo['mime'];
-
-        // Buat resource gambar berdasarkan tipe asli
-        try {
-            switch ($mime) {
-                case 'image/jpeg': $image = @imagecreatefromjpeg($file->getRealPath()); break;
-                case 'image/png':  $image = @imagecreatefrompng($file->getRealPath()); break;
-                case 'image/webp': $image = @imagecreatefromwebp($file->getRealPath()); break;
-                case 'image/gif':  $image = @imagecreatefromgif($file->getRealPath()); break;
-                default: return null;
+        $image = null;
+        if (is_string($file) && str_starts_with($file, 'data:image/')) {
+            try {
+                if (preg_match('/^data:image\/(\w+);base64,/', $file, $type)) {
+                    $data = base64_decode(substr($file, strpos($file, ',') + 1));
+                    if ($data === false) return null;
+                    $image = @imagecreatefromstring($data);
+                } else {
+                    return null;
+                }
+            } catch (\Exception $e) {
+                return null;
             }
-        } catch (\Exception $e) {
-            return null;
+        } else {
+            // Ambil info mime-type dengan peredam error (@)
+            $imageInfo = @getimagesize($file->getRealPath());
+            
+            if (!$imageInfo) {
+                return null; // File bukan gambar yang valid
+            }
+            
+            $mime = $imageInfo['mime'];
+
+            // Buat resource gambar berdasarkan tipe asli
+            try {
+                switch ($mime) {
+                    case 'image/jpeg': $image = @imagecreatefromjpeg($file->getRealPath()); break;
+                    case 'image/png':  $image = @imagecreatefrompng($file->getRealPath()); break;
+                    case 'image/webp': $image = @imagecreatefromwebp($file->getRealPath()); break;
+                    case 'image/gif':  $image = @imagecreatefromgif($file->getRealPath()); break;
+                    default: return null;
+                }
+            } catch (\Exception $e) {
+                return null;
+            }
         }
 
         if (!$image) return null;

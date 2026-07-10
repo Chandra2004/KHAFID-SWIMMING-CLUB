@@ -670,7 +670,7 @@
                                                     <div class="relative group cursor-pointer">
                                                         <input type="file" id="payment_proof_input"
                                                             accept="image/*"
-                                                            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" required onchange="previewSingleImage(this, 'preview-payment-proof', 'placeholder-payment-proof')">
+                                                            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" required onchange="previewSingleImage(this, 'preview-payment-proof', 'placeholder-payment-proof'); readAndSetBase64(this, base64 => @this.set('create_payment_proof', base64))">
                                                         
                                                         <!-- Tambahkan wire:ignore agar DOM tidak di-reset oleh Livewire saat re-render -->
                                                         <div wire:ignore
@@ -709,19 +709,12 @@
                             let fileInput = document.getElementById('payment_proof_input');
                             
                             if (method === 'transfer') {
-                                if (!fileInput || !fileInput.files[0]) {
+                                if (!fileInput || (!fileInput.files[0] && !@this.get('create_payment_proof'))) {
                                     alert('Peringatan: Harap pilih foto bukti transfer terlebih dahulu.');
                                     return;
                                 }
-                                let file = fileInput.files[0];
-                                @this.upload('create_payment_proof', file, (uploadedFilename) => {
-                                    @this.call('saveManualRegistration');
-                                }, () => {
-                                    alert('Gagal mengupload bukti pembayaran.');
-                                });
-                            } else {
-                                @this.call('saveManualRegistration');
                             }
+                            @this.call('saveManualRegistration');
                         "
                         wire:loading.attr="disabled"
                         wire:target="saveManualRegistration, create_payment_proof"

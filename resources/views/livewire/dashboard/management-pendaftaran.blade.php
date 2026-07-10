@@ -426,7 +426,7 @@ new class extends Component {
                 'create_event_categories' => 'required|array|min:1',
                 'create_status' => 'required|in:pending,confirmed',
                 'create_payment_method' => 'required|in:cash,transfer',
-                'create_payment_proof' => ($hasPaidCategory && $this->create_payment_method === 'transfer') ? 'required|image|max:5120' : 'nullable|image|max:5120',
+                'create_payment_proof' => ($hasPaidCategory && $this->create_payment_method === 'transfer') ? 'required|string' : 'nullable|string',
             ], [
                 'create_payment_proof.required' => 'Wajib melampirkan bukti pembayaran untuk metode transfer.',
                 'create_user_uids.required' => 'Pilih minimal satu peserta.',
@@ -1936,6 +1936,7 @@ new class extends Component {
                                                                     if (previewImg) { previewImg.src = e.target.result; previewImg.classList.remove('hidden'); }
                                                                     if (placeholder) placeholder.classList.add('hidden');
                                                                     if (uploaded) uploaded.classList.remove('hidden');
+                                                                    @this.set('create_payment_proof', e.target.result);
                                                                 };
                                                                 reader.readAsDataURL(file);
                                                             ">
@@ -1992,21 +1993,11 @@ new class extends Component {
                     <button type="button" id="mpSaveBtn"
                         @click="
                             const proofFile = document.getElementById('mp_payment_proof')?.files[0];
-                            if (proofFile) {
-                                document.getElementById('mpSaveText').classList.add('hidden');
-                                document.getElementById('mpSaveLoading').classList.remove('hidden');
-                                document.getElementById('mpSaveBtn').disabled = true;
-                                new Promise((resolve, reject) => { @this.upload('create_payment_proof', proofFile, resolve, reject); })
-                                    .then(() => { @this.call('saveManualRegistration'); })
-                                    .catch(() => {
-                                        alert('Gagal mengunggah bukti transfer. Silakan coba lagi.');
-                                        document.getElementById('mpSaveText').classList.remove('hidden');
-                                        document.getElementById('mpSaveLoading').classList.add('hidden');
-                                        document.getElementById('mpSaveBtn').disabled = false;
-                                    });
-                            } else {
-                                @this.call('saveManualRegistration');
+                            if (proofFile && !@this.get('create_payment_proof')) {
+                                alert('Peringatan: Harap tunggu gambar selesai dimuat.');
+                                return;
                             }
+                            @this.call('saveManualRegistration');
                         "
                         class="px-8 py-3.5 bg-ksc-blue text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-blue-100 hover:bg-blue-700 transition transform hover:-translate-y-1 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2">
                         <span id="mpSaveText">Simpan Pendaftaran</span>

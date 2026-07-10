@@ -77,7 +77,7 @@ class EventDetail extends Component
                 ->toArray();
             
             $this->create_user_uids = [$user->uid];
-            $this->user = $user->load('profile');
+            $this->user = \App\Models\User::with('profile')->where('uid', $user->uid)->first();
         }
 
         $this->event = [
@@ -238,7 +238,7 @@ class EventDetail extends Component
                 'create_event_categories' => 'required|array|min:1',
                 'create_status' => 'required|in:pending,confirmed',
                 'create_payment_method' => 'required|in:cash,transfer',
-                'create_payment_proof' => ($hasPaidCategory && $this->create_payment_method === 'transfer') ? 'required|image|max:5120' : 'nullable|image|max:5120',
+                'create_payment_proof' => ($hasPaidCategory && $this->create_payment_method === 'transfer') ? 'required|string' : 'nullable|string',
             ], [
                 'create_payment_proof.required' => 'Wajib melampirkan bukti pembayaran untuk metode transfer.',
                 'create_user_uids.required' => 'Peserta tidak terdeteksi.',
@@ -413,13 +413,15 @@ class EventDetail extends Component
         }
         
         $availableUsers = [];
-        if (auth()->check() && auth()->user()->can('master-pendaftaran.create')) {
+        if (\Illuminate\Support\Facades\Auth::check() && \Illuminate\Support\Facades\Gate::allows('master-pendaftaran.create')) {
              $availableUsers = $usersQuery->take(50)->get();
         }
 
-        return view('livewire.homepage.event-detail', [
+        /** @var mixed $view */
+        $view = view('livewire.homepage.event-detail', [
             'availableCategories' => $availableCategories,
             'availableUsers' => $availableUsers
-        ])->layout('layouts.layout-homepage.app', ['title' => "KSC - " . $this->event['nama_event']]);
+        ]);
+        return $view->layout('layouts.layout-homepage.app', ['title' => "KSC - " . $this->event['nama_event']]);
     }
 }

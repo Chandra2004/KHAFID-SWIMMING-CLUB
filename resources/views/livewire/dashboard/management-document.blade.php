@@ -126,8 +126,8 @@ new class extends Component {
             'description' => 'nullable|string',
             'content' => 'nullable|string',
             'is_public' => 'boolean',
-            'logo_left' => 'nullable|image|max:2048',
-            'logo_right' => 'nullable|image|max:2048',
+            'logo_left' => 'nullable|string',
+            'logo_right' => 'nullable|string',
         ]);
 
         $data = [
@@ -156,11 +156,11 @@ new class extends Component {
         ];
 
         if ($this->logo_left) {
-            $data['logo_left'] = $this->logo_left->store('documents/logos', 'public');
+            $data['logo_left'] = ImageHelper::uploadToWebp($this->logo_left, 'documents/logos', $this->existingLogoLeft);
         }
 
         if ($this->logo_right) {
-            $data['logo_right'] = $this->logo_right->store('documents/logos', 'public');
+            $data['logo_right'] = ImageHelper::uploadToWebp($this->logo_right, 'documents/logos', $this->existingLogoRight);
         }
 
         if ($this->modalMode === 'create') {
@@ -357,28 +357,20 @@ new class extends Component {
                 </div>
 
                 <form x-data @submit.prevent="
-                    let promises = [];
-                    let ll = document.getElementById('md_logo_left')?.files[0];
-                    if (ll) promises.push(new Promise((resolve, reject) => { @this.upload('logo_left', ll, resolve, reject); }));
-                    let lr = document.getElementById('md_logo_right')?.files[0];
-                    if (lr) promises.push(new Promise((resolve, reject) => { @this.upload('logo_right', lr, resolve, reject); }));
-                    
-                    if (promises.length > 0) {
-                        $refs.mdSubmitBtn.disabled = true;
-                        $refs.mdSubmitText.classList.add('hidden');
-                        $refs.mdLoadingText.classList.remove('hidden');
-                        Promise.all(promises).then(() => {
-                            @this.call('save');
-                            setTimeout(() => { $refs.mdSubmitBtn.disabled = false; $refs.mdSubmitText.classList.remove('hidden'); $refs.mdLoadingText.classList.add('hidden'); }, 2000);
-                        }).catch(() => {
-                            alert('Gagal mengunggah logo. Silakan coba lagi.');
+                    $refs.mdSubmitBtn.disabled = true;
+                    $refs.mdSubmitText.classList.add('hidden');
+                    $refs.mdLoadingText.classList.remove('hidden');
+                    @this.call('save').then(() => {
+                        setTimeout(() => {
                             $refs.mdSubmitBtn.disabled = false;
                             $refs.mdSubmitText.classList.remove('hidden');
                             $refs.mdLoadingText.classList.add('hidden');
-                        });
-                    } else {
-                        @this.call('save');
-                    }
+                        }, 1000);
+                    }).catch(() => {
+                        $refs.mdSubmitBtn.disabled = false;
+                        $refs.mdSubmitText.classList.remove('hidden');
+                        $refs.mdLoadingText.classList.add('hidden');
+                    });
                 " class="p-8">
                     @if($activeTab === 'general')
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -419,7 +411,7 @@ new class extends Component {
                                     <div wire:ignore class="flex items-center gap-4">
                                         <div id="preview_md_logo_left_wrap" class="flex items-center">
                                             @if($existingLogoLeft)
-                                                <img id="preview_md_logo_left" src="{{ asset('storage/' . $existingLogoLeft) }}" class="w-20 h-20 object-contain rounded-xl border border-slate-100">
+                                                <img id="preview_md_logo_left" src="{{ str_starts_with($existingLogoLeft, 'uploads/') ? asset($existingLogoLeft) : asset('storage/' . $existingLogoLeft) }}" class="w-20 h-20 object-contain rounded-xl border border-slate-100">
                                             @else
                                                 <img id="preview_md_logo_left" src="" class="w-20 h-20 object-contain rounded-xl border border-slate-100 hidden">
                                                 <div id="placeholder_md_logo_left" class="w-20 h-20 bg-slate-50 rounded-xl flex items-center justify-center border-2 border-dashed border-slate-200">
@@ -427,7 +419,7 @@ new class extends Component {
                                                 </div>
                                             @endif
                                         </div>
-                                        <input type="file" id="md_logo_left" class="text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" onchange="previewSingleImage(this, 'preview_md_logo_left', 'placeholder_md_logo_left')">
+                                        <input type="file" id="md_logo_left" class="text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" onchange="previewSingleImage(this, 'preview_md_logo_left', 'placeholder_md_logo_left'); readAndSetBase64(this, base64 => @this.set('logo_left', base64))">
                                     </div>
                                     @error('logo_left') <span class="text-[10px] text-rose-500 font-bold ml-1">{{ $message }}</span> @enderror
                                 </div>
@@ -437,7 +429,7 @@ new class extends Component {
                                     <div wire:ignore class="flex items-center gap-4">
                                         <div id="preview_md_logo_right_wrap" class="flex items-center">
                                             @if($existingLogoRight)
-                                                <img id="preview_md_logo_right" src="{{ asset('storage/' . $existingLogoRight) }}" class="w-20 h-20 object-contain rounded-xl border border-slate-100">
+                                                <img id="preview_md_logo_right" src="{{ str_starts_with($existingLogoRight, 'uploads/') ? asset($existingLogoRight) : asset('storage/' . $existingLogoRight) }}" class="w-20 h-20 object-contain rounded-xl border border-slate-100">
                                             @else
                                                 <img id="preview_md_logo_right" src="" class="w-20 h-20 object-contain rounded-xl border border-slate-100 hidden">
                                                 <div id="placeholder_md_logo_right" class="w-20 h-20 bg-slate-50 rounded-xl flex items-center justify-center border-2 border-dashed border-slate-200">
@@ -445,7 +437,7 @@ new class extends Component {
                                                 </div>
                                             @endif
                                         </div>
-                                        <input type="file" id="md_logo_right" class="text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" onchange="previewSingleImage(this, 'preview_md_logo_right', 'placeholder_md_logo_right')">
+                                        <input type="file" id="md_logo_right" class="text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" onchange="previewSingleImage(this, 'preview_md_logo_right', 'placeholder_md_logo_right'); readAndSetBase64(this, base64 => @this.set('logo_right', base64))">
                                     </div>
                                     @error('logo_right') <span class="text-[10px] text-rose-500 font-bold ml-1">{{ $message }}</span> @enderror
                                 </div>

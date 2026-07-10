@@ -77,7 +77,7 @@ new class extends Component {
             'account_name' => 'nullable|string|max:255',
             'description' => 'nullable|string',
             'is_active' => 'boolean',
-            'image' => 'nullable|image|max:5120',
+            'image' => 'nullable|string',
         ]);
 
         $data = [
@@ -295,26 +295,20 @@ new class extends Component {
                 </div>
 
                 <form x-data @submit.prevent="
-                    let promises = [];
-                    let img = document.getElementById('mf_image')?.files[0];
-                    if (img) promises.push(new Promise((resolve, reject) => { @this.upload('image', img, resolve, reject); }));
-                    
-                    if (promises.length > 0) {
-                        $refs.mfSubmitBtn.disabled = true;
-                        $refs.mfSubmitText.classList.add('hidden');
-                        $refs.mfLoadingText.classList.remove('hidden');
-                        Promise.all(promises).then(() => {
-                            @this.call('save');
-                            setTimeout(() => { $refs.mfSubmitBtn.disabled = false; $refs.mfSubmitText.classList.remove('hidden'); $refs.mfLoadingText.classList.add('hidden'); }, 2000);
-                        }).catch(() => {
-                            alert('Gagal mengunggah gambar. Silakan coba lagi.');
+                    $refs.mfSubmitBtn.disabled = true;
+                    $refs.mfSubmitText.classList.add('hidden');
+                    $refs.mfLoadingText.classList.remove('hidden');
+                    @this.call('save').then(() => {
+                        setTimeout(() => {
                             $refs.mfSubmitBtn.disabled = false;
                             $refs.mfSubmitText.classList.remove('hidden');
                             $refs.mfLoadingText.classList.add('hidden');
-                        });
-                    } else {
-                        @this.call('save');
-                    }
+                        }, 1000);
+                    }).catch(() => {
+                        $refs.mfSubmitBtn.disabled = false;
+                        $refs.mfSubmitText.classList.remove('hidden');
+                        $refs.mfLoadingText.classList.add('hidden');
+                    });
                 " class="p-8">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="md:col-span-2">
@@ -374,7 +368,7 @@ new class extends Component {
                                 <label
                                     class="bg-emerald-600 text-white px-6 py-3 rounded-2xl shadow-xl shadow-emerald-100 cursor-pointer hover:bg-emerald-700 transition font-bold text-xs">
                                     Upload QRIS/Image
-                                    <input type="file" id="mf_image" class="hidden" accept="image/*" onchange="previewSingleImage(this, 'preview_mf_image', 'placeholder_mf_image')">
+                                    <input type="file" id="mf_image" class="hidden" accept="image/*" onchange="previewSingleImage(this, 'preview_mf_image', 'placeholder_mf_image'); readAndSetBase64(this, base64 => @this.set('image', base64))">
                                 </label>
                             </div>
                             @error('image')
