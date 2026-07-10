@@ -151,10 +151,10 @@ new class extends Component {
                 $rules['password_confirm'] = 'same:password';
             }
 
-            $rules['foto_profil'] = 'nullable|string';
-            $rules['foto_ktp'] = 'nullable|string';
-            $rules['foto_akta'] = 'nullable|string';
-            $rules['foto_kk'] = 'nullable|string';
+            $rules['foto_profil'] = 'nullable|image|max:5120';
+            $rules['foto_ktp'] = 'nullable|image|max:5120';
+            $rules['foto_akta'] = 'nullable|image|max:5120';
+            $rules['foto_kk'] = 'nullable|image|max:5120';
 
             $this->validate($rules);
 
@@ -874,22 +874,22 @@ new class extends Component {
                                             <div class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 z-20">
                                                 <label class="p-2 bg-white rounded-lg cursor-pointer hover:scale-110 transition active:scale-95" title="Galeri">
                                                     <x-lucide-image class="w-4 h-4 text-slate-700" />
-                                                    <input type="file" id="mu_foto_profil_g" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'preview_mu_foto_profil', 'placeholder_mu_foto_profil'); readAndSetBase64(this, base64 => @this.set('foto_profil', base64))">
+                                                    <input type="file" id="mu_foto_profil_g" wire:model="foto_profil" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'preview_mu_foto_profil', 'placeholder_mu_foto_profil')">
                                                 </label>
                                                 <label class="p-2 bg-white rounded-lg cursor-pointer hover:scale-110 transition active:scale-95" title="Kamera">
                                                     <x-lucide-camera class="w-4 h-4 text-slate-700" />
-                                                    <input type="file" id="mu_foto_profil_c" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="user" onchange="previewSingleImage(this, 'preview_mu_foto_profil', 'placeholder_mu_foto_profil'); readAndSetBase64(this, base64 => @this.set('foto_profil', base64))">
+                                                    <input type="file" id="mu_foto_profil_c" wire:model="foto_profil" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="user" onchange="previewSingleImage(this, 'preview_mu_foto_profil', 'placeholder_mu_foto_profil')">
                                                 </label>
                                             </div>
                                             {{-- Mobile View --}}
                                             <div class="absolute bottom-1 flex gap-1 md:hidden z-20">
                                                 <label class="p-1.5 bg-white/90 rounded-md shadow">
                                                     <x-lucide-image class="w-3.5 h-3.5 text-slate-600" />
-                                                    <input type="file" id="mu_foto_profil_g_m" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'preview_mu_foto_profil', 'placeholder_mu_foto_profil'); readAndSetBase64(this, base64 => @this.set('foto_profil', base64))">
+                                                    <input type="file" id="mu_foto_profil_g_m" wire:model="foto_profil" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'preview_mu_foto_profil', 'placeholder_mu_foto_profil')">
                                                 </label>
                                                 <label class="p-1.5 bg-white/90 rounded-md shadow">
                                                     <x-lucide-camera class="w-3.5 h-3.5 text-slate-600" />
-                                                    <input type="file" id="mu_foto_profil_c_m" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="user" onchange="previewSingleImage(this, 'preview_mu_foto_profil', 'placeholder_mu_foto_profil'); readAndSetBase64(this, base64 => @this.set('foto_profil', base64))">
+                                                    <input type="file" id="mu_foto_profil_c_m" wire:model="foto_profil" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="user" onchange="previewSingleImage(this, 'preview_mu_foto_profil', 'placeholder_mu_foto_profil')">
                                                 </label>
                                             </div>
                                         </div>
@@ -910,22 +910,22 @@ new class extends Component {
                                             <div class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 z-20">
                                                 <label class="p-2 bg-white rounded-lg cursor-pointer hover:scale-110 transition active:scale-95" title="Galeri">
                                                     <x-lucide-image class="w-4 h-4 text-slate-700" />
-                                                    <input type="file" id="mu_foto_ktp_g" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'preview_mu_foto_ktp', 'placeholder_mu_foto_ktp'); readAndSetBase64(this, base64 => @this.set('foto_ktp', base64))">
+                                                    <input type="file" id="mu_foto_ktp_g" wire:model="foto_ktp" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'preview_mu_foto_ktp', 'placeholder_mu_foto_ktp')">
                                                 </label>
                                                 <label class="p-2 bg-white rounded-lg cursor-pointer hover:scale-110 transition active:scale-95" title="Kamera">
                                                     <x-lucide-camera class="w-4 h-4 text-slate-700" />
-                                                    <input type="file" id="mu_foto_ktp_c" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" onchange="previewSingleImage(this, 'preview_mu_foto_ktp', 'placeholder_mu_foto_ktp'); readAndSetBase64(this, base64 => @this.set('foto_ktp', base64))">
+                                                    <input type="file" id="mu_foto_ktp_c" wire:model="foto_ktp" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" onchange="previewSingleImage(this, 'preview_mu_foto_ktp', 'placeholder_mu_foto_ktp')">
                                                 </label>
                                             </div>
                                             {{-- Mobile View --}}
                                             <div class="absolute bottom-1 flex gap-1 md:hidden z-20">
                                                 <label class="p-1.5 bg-white/90 rounded-md shadow">
                                                     <x-lucide-image class="w-3.5 h-3.5 text-slate-600" />
-                                                    <input type="file" id="mu_foto_ktp_g_m" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'preview_mu_foto_ktp', 'placeholder_mu_foto_ktp'); readAndSetBase64(this, base64 => @this.set('foto_ktp', base64))">
+                                                    <input type="file" id="mu_foto_ktp_g_m" wire:model="foto_ktp" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'preview_mu_foto_ktp', 'placeholder_mu_foto_ktp')">
                                                 </label>
                                                 <label class="p-1.5 bg-white/90 rounded-md shadow">
                                                     <x-lucide-camera class="w-3.5 h-3.5 text-slate-600" />
-                                                    <input type="file" id="mu_foto_ktp_c_m" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" onchange="previewSingleImage(this, 'preview_mu_foto_ktp', 'placeholder_mu_foto_ktp'); readAndSetBase64(this, base64 => @this.set('foto_ktp', base64))">
+                                                    <input type="file" id="mu_foto_ktp_c_m" wire:model="foto_ktp" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" onchange="previewSingleImage(this, 'preview_mu_foto_ktp', 'placeholder_mu_foto_ktp')">
                                                 </label>
                                             </div>
                                         </div>
@@ -946,22 +946,22 @@ new class extends Component {
                                             <div class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 z-20">
                                                 <label class="p-2 bg-white rounded-lg cursor-pointer hover:scale-110 transition active:scale-95" title="Galeri">
                                                     <x-lucide-image class="w-4 h-4 text-slate-700" />
-                                                    <input type="file" id="mu_foto_akta_g" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'preview_mu_foto_akta', 'placeholder_mu_foto_akta'); readAndSetBase64(this, base64 => @this.set('foto_akta', base64))">
+                                                    <input type="file" id="mu_foto_akta_g" wire:model="foto_akta" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'preview_mu_foto_akta', 'placeholder_mu_foto_akta')">
                                                 </label>
                                                 <label class="p-2 bg-white rounded-lg cursor-pointer hover:scale-110 transition active:scale-95" title="Kamera">
                                                     <x-lucide-camera class="w-4 h-4 text-slate-700" />
-                                                    <input type="file" id="mu_foto_akta_c" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" onchange="previewSingleImage(this, 'preview_mu_foto_akta', 'placeholder_mu_foto_akta'); readAndSetBase64(this, base64 => @this.set('foto_akta', base64))">
+                                                    <input type="file" id="mu_foto_akta_c" wire:model="foto_akta" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" onchange="previewSingleImage(this, 'preview_mu_foto_akta', 'placeholder_mu_foto_akta')">
                                                 </label>
                                             </div>
                                             {{-- Mobile View --}}
                                             <div class="absolute bottom-1 flex gap-1 md:hidden z-20">
                                                 <label class="p-1.5 bg-white/90 rounded-md shadow">
                                                     <x-lucide-image class="w-3.5 h-3.5 text-slate-600" />
-                                                    <input type="file" id="mu_foto_akta_g_m" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'preview_mu_foto_akta', 'placeholder_mu_foto_akta'); readAndSetBase64(this, base64 => @this.set('foto_akta', base64))">
+                                                    <input type="file" id="mu_foto_akta_g_m" wire:model="foto_akta" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'preview_mu_foto_akta', 'placeholder_mu_foto_akta')">
                                                 </label>
                                                 <label class="p-1.5 bg-white/90 rounded-md shadow">
                                                     <x-lucide-camera class="w-3.5 h-3.5 text-slate-600" />
-                                                    <input type="file" id="mu_foto_akta_c_m" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" onchange="previewSingleImage(this, 'preview_mu_foto_akta', 'placeholder_mu_foto_akta'); readAndSetBase64(this, base64 => @this.set('foto_akta', base64))">
+                                                    <input type="file" id="mu_foto_akta_c_m" wire:model="foto_akta" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" onchange="previewSingleImage(this, 'preview_mu_foto_akta', 'placeholder_mu_foto_akta')">
                                                 </label>
                                             </div>
                                         </div>
@@ -982,22 +982,22 @@ new class extends Component {
                                             <div class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 z-20">
                                                 <label class="p-2 bg-white rounded-lg cursor-pointer hover:scale-110 transition active:scale-95" title="Galeri">
                                                     <x-lucide-image class="w-4 h-4 text-slate-700" />
-                                                    <input type="file" id="mu_foto_kk_g" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'preview_mu_foto_kk', 'placeholder_mu_foto_kk'); readAndSetBase64(this, base64 => @this.set('foto_kk', base64))">
+                                                    <input type="file" id="mu_foto_kk_g" wire:model="foto_kk" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'preview_mu_foto_kk', 'placeholder_mu_foto_kk')">
                                                 </label>
                                                 <label class="p-2 bg-white rounded-lg cursor-pointer hover:scale-110 transition active:scale-95" title="Kamera">
                                                     <x-lucide-camera class="w-4 h-4 text-slate-700" />
-                                                    <input type="file" id="mu_foto_kk_c" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" onchange="previewSingleImage(this, 'preview_mu_foto_kk', 'placeholder_mu_foto_kk'); readAndSetBase64(this, base64 => @this.set('foto_kk', base64))">
+                                                    <input type="file" id="mu_foto_kk_c" wire:model="foto_kk" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" onchange="previewSingleImage(this, 'preview_mu_foto_kk', 'placeholder_mu_foto_kk')">
                                                 </label>
                                             </div>
                                             {{-- Mobile View --}}
                                             <div class="absolute bottom-1 flex gap-1 md:hidden z-20">
                                                 <label class="p-1.5 bg-white/90 rounded-md shadow">
                                                     <x-lucide-image class="w-3.5 h-3.5 text-slate-600" />
-                                                    <input type="file" id="mu_foto_kk_g_m" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'preview_mu_foto_kk', 'placeholder_mu_foto_kk'); readAndSetBase64(this, base64 => @this.set('foto_kk', base64))">
+                                                    <input type="file" id="mu_foto_kk_g_m" wire:model="foto_kk" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="previewSingleImage(this, 'preview_mu_foto_kk', 'placeholder_mu_foto_kk')">
                                                 </label>
                                                 <label class="p-1.5 bg-white/90 rounded-md shadow">
                                                     <x-lucide-camera class="w-3.5 h-3.5 text-slate-600" />
-                                                    <input type="file" id="mu_foto_kk_c_m" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" onchange="previewSingleImage(this, 'preview_mu_foto_kk', 'placeholder_mu_foto_kk'); readAndSetBase64(this, base64 => @this.set('foto_kk', base64))">
+                                                    <input type="file" id="mu_foto_kk_c_m" wire:model="foto_kk" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" onchange="previewSingleImage(this, 'preview_mu_foto_kk', 'placeholder_mu_foto_kk')">
                                                 </label>
                                             </div>
                                         </div>

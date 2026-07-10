@@ -116,8 +116,8 @@ new class extends Component {
             'title' => 'required|string|max:255',
             'event_uid' => 'nullable|exists:events,uid',
             'description' => 'nullable|string',
-            'cover_image' => 'nullable|string',
-            'photos.*' => 'string',
+            'cover_image' => 'nullable|image|max:5120',
+            'photos.*' => 'image|max:5120',
             'photos' => 'nullable|array|max:50',
             'is_active' => 'boolean',
         ]);
@@ -502,8 +502,8 @@ new class extends Component {
                                         <label
                                             class="bg-slate-900 text-white px-6 py-3 rounded-2xl cursor-pointer hover:bg-slate-800 transition font-bold text-[10px] uppercase tracking-[0.2em]">
                                             Ganti Sampul
-                                            <input type="file" id="mg_cover_image" class="hidden"
-                                                accept="image/*" onchange="previewSingleImage(this, 'preview_mg_cover', 'placeholder_mg_cover'); readAndSetBase64(this, base64 => @this.set('cover_image', base64))">
+                                            <input type="file" id="mg_cover_image" wire:model="cover_image" class="hidden"
+                                                accept="image/*" onchange="previewSingleImage(this, 'preview_mg_cover', 'placeholder_mg_cover')">
                                         </label>
                                     </div>
                                 </div>
@@ -521,14 +521,13 @@ new class extends Component {
                                         <label
                                             class="text-indigo-600 font-black text-[10px] uppercase tracking-widest cursor-pointer hover:underline">
                                             + Tambah Foto
-                                            <input type="file" id="mg_photos" class="hidden"
+                                            <input type="file" id="mg_photos" wire:model="photos" class="hidden"
                                                 accept="image/*" multiple onchange="
                                                      previewMultipleImages(this, 'mg_photos_preview');
                                                      const count = this.files.length;
                                                      const countEl = document.getElementById('mgPhotosCount');
                                                      if (count > 0) { countEl.textContent = '(' + count + ' Terpilih)'; countEl.classList.remove('hidden'); }
                                                      else { countEl.classList.add('hidden'); }
-                                                     readMultipleAndSetBase64(this, base64Array => @this.set('photos', base64Array));
                                                  ">
                                         </label>
                                     </div>

@@ -238,7 +238,7 @@ class EventDetail extends Component
                 'create_event_categories' => 'required|array|min:1',
                 'create_status' => 'required|in:pending,confirmed',
                 'create_payment_method' => 'required|in:cash,transfer',
-                'create_payment_proof' => ($hasPaidCategory && $this->create_payment_method === 'transfer') ? 'required|string' : 'nullable|string',
+                'create_payment_proof' => ($hasPaidCategory && $this->create_payment_method === 'transfer') ? 'required|image|max:5120' : 'nullable|image|max:5120',
             ], [
                 'create_payment_proof.required' => 'Wajib melampirkan bukti pembayaran untuk metode transfer.',
                 'create_user_uids.required' => 'Peserta tidak terdeteksi.',

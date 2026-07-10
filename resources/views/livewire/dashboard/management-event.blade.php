@@ -124,9 +124,9 @@ new class extends Component {
             'status' => 'required|in:draft,upcoming,ongoing,completed,cancelled',
             'group_link' => 'nullable|url|max:255',
             'payment_method_uid' => 'nullable|exists:finance_accounts,uid',
-            'banner' => 'nullable|string',
-            'logo_left' => 'nullable|string',
-            'logo_right' => 'nullable|string',
+            'banner' => 'nullable|image|max:2048',
+            'logo_left' => 'nullable|image|max:2048',
+            'logo_right' => 'nullable|image|max:2048',
         ]);
 
         $data = [
@@ -541,7 +541,7 @@ new class extends Component {
                                                     <x-lucide-award class="w-6 h-6 text-slate-300 group-hover:text-ksc-blue transition mb-2" />
                                                     <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest group-hover:text-ksc-blue transition">Logo Kiri</span>
                                                 </div>
-                                                <input type="file" id="me_logo_left" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer z-30" onchange="previewSingleImage(this, 'preview_me_logo_left', 'placeholder_me_logo_left'); readAndSetBase64(this, base64 => @this.set('logo_left', base64))">
+                                                <input type="file" id="me_logo_left" wire:model="logo_left" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer z-30" onchange="previewSingleImage(this, 'preview_me_logo_left', 'placeholder_me_logo_left')">
                                             </div>
                                             <div wire:ignore class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue">
                                                 <div class="absolute inset-0 w-full h-full z-0 pointer-events-none">
@@ -551,7 +551,7 @@ new class extends Component {
                                                     <x-lucide-award class="w-6 h-6 text-slate-300 group-hover:text-ksc-blue transition mb-2" />
                                                     <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest group-hover:text-ksc-blue transition">Logo Kanan</span>
                                                 </div>
-                                                <input type="file" id="me_logo_right" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer z-30" onchange="previewSingleImage(this, 'preview_me_logo_right', 'placeholder_me_logo_right'); readAndSetBase64(this, base64 => @this.set('logo_right', base64))">
+                                                <input type="file" id="me_logo_right" wire:model="logo_right" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer z-30" onchange="previewSingleImage(this, 'preview_me_logo_right', 'placeholder_me_logo_right')">
                                             </div>
                                         </div>
                                         <div class="flex justify-between mt-1">
@@ -569,7 +569,7 @@ new class extends Component {
                                                 <x-lucide-image class="w-6 h-6 text-slate-300 group-hover:text-ksc-blue transition mb-2" />
                                                 <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest group-hover:text-ksc-blue transition">Unggah Banner</span>
                                             </div>
-                                            <input type="file" id="me_banner" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer z-30" onchange="previewSingleImage(this, 'preview_me_banner', 'placeholder_me_banner'); readAndSetBase64(this, base64 => @this.set('banner', base64))">
+                                            <input type="file" id="me_banner" wire:model="banner" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer z-30" onchange="previewSingleImage(this, 'preview_me_banner', 'placeholder_me_banner')">
                                         </div>
                                         @error('banner') <span class="text-[9px] text-rose-500 font-bold mt-1 uppercase">{{ $message }}</span> @enderror
                                     </div>

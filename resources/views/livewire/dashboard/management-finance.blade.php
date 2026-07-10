@@ -77,7 +77,7 @@ new class extends Component {
             'account_name' => 'nullable|string|max:255',
             'description' => 'nullable|string',
             'is_active' => 'boolean',
-            'image' => 'nullable|string',
+            'image' => 'nullable|image|max:5120',
         ]);
 
         $data = [
@@ -294,22 +294,7 @@ new class extends Component {
                     </button>
                 </div>
 
-                <form x-data @submit.prevent="
-                    $refs.mfSubmitBtn.disabled = true;
-                    $refs.mfSubmitText.classList.add('hidden');
-                    $refs.mfLoadingText.classList.remove('hidden');
-                    @this.call('save').then(() => {
-                        setTimeout(() => {
-                            $refs.mfSubmitBtn.disabled = false;
-                            $refs.mfSubmitText.classList.remove('hidden');
-                            $refs.mfLoadingText.classList.add('hidden');
-                        }, 1000);
-                    }).catch(() => {
-                        $refs.mfSubmitBtn.disabled = false;
-                        $refs.mfSubmitText.classList.remove('hidden');
-                        $refs.mfLoadingText.classList.add('hidden');
-                    });
-                " class="p-8">
+                <form wire:submit.prevent="save" class="p-8">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="md:col-span-2">
                             <label
@@ -368,7 +353,7 @@ new class extends Component {
                                 <label
                                     class="bg-emerald-600 text-white px-6 py-3 rounded-2xl shadow-xl shadow-emerald-100 cursor-pointer hover:bg-emerald-700 transition font-bold text-xs">
                                     Upload QRIS/Image
-                                    <input type="file" id="mf_image" class="hidden" accept="image/*" onchange="previewSingleImage(this, 'preview_mf_image', 'placeholder_mf_image'); readAndSetBase64(this, base64 => @this.set('image', base64))">
+                                    <input type="file" id="mf_image" wire:model="image" class="hidden" accept="image/*" onchange="previewSingleImage(this, 'preview_mf_image', 'placeholder_mf_image')">
                                 </label>
                             </div>
                             @error('image')

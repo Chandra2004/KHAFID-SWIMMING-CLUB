@@ -126,8 +126,8 @@ new class extends Component {
             'description' => 'nullable|string',
             'content' => 'nullable|string',
             'is_public' => 'boolean',
-            'logo_left' => 'nullable|string',
-            'logo_right' => 'nullable|string',
+            'logo_left' => 'nullable|image|max:2048',
+            'logo_right' => 'nullable|image|max:2048',
         ]);
 
         $data = [
@@ -356,22 +356,7 @@ new class extends Component {
                     <button type="button" wire:click="$set('activeTab', 'preview')" class="px-5 py-3 text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap {{ $activeTab === 'preview' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-slate-400 hover:text-slate-600' }}">Preview</button>
                 </div>
 
-                <form x-data @submit.prevent="
-                    $refs.mdSubmitBtn.disabled = true;
-                    $refs.mdSubmitText.classList.add('hidden');
-                    $refs.mdLoadingText.classList.remove('hidden');
-                    @this.call('save').then(() => {
-                        setTimeout(() => {
-                            $refs.mdSubmitBtn.disabled = false;
-                            $refs.mdSubmitText.classList.remove('hidden');
-                            $refs.mdLoadingText.classList.add('hidden');
-                        }, 1000);
-                    }).catch(() => {
-                        $refs.mdSubmitBtn.disabled = false;
-                        $refs.mdSubmitText.classList.remove('hidden');
-                        $refs.mdLoadingText.classList.add('hidden');
-                    });
-                " class="p-8">
+                <form wire:submit.prevent="save" class="p-8">
                     @if($activeTab === 'general')
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="space-y-6">
@@ -419,7 +404,7 @@ new class extends Component {
                                                 </div>
                                             @endif
                                         </div>
-                                        <input type="file" id="md_logo_left" class="text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" onchange="previewSingleImage(this, 'preview_md_logo_left', 'placeholder_md_logo_left'); readAndSetBase64(this, base64 => @this.set('logo_left', base64))">
+                                        <input type="file" id="md_logo_left" wire:model="logo_left" class="text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" onchange="previewSingleImage(this, 'preview_md_logo_left', 'placeholder_md_logo_left')">
                                     </div>
                                     @error('logo_left') <span class="text-[10px] text-rose-500 font-bold ml-1">{{ $message }}</span> @enderror
                                 </div>
@@ -437,7 +422,7 @@ new class extends Component {
                                                 </div>
                                             @endif
                                         </div>
-                                        <input type="file" id="md_logo_right" class="text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" onchange="previewSingleImage(this, 'preview_md_logo_right', 'placeholder_md_logo_right'); readAndSetBase64(this, base64 => @this.set('logo_right', base64))">
+                                        <input type="file" id="md_logo_right" wire:model="logo_right" class="text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" onchange="previewSingleImage(this, 'preview_md_logo_right', 'placeholder_md_logo_right')">
                                     </div>
                                     @error('logo_right') <span class="text-[10px] text-rose-500 font-bold ml-1">{{ $message }}</span> @enderror
                                 </div>

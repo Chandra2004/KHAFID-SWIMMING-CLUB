@@ -74,7 +74,7 @@ new class extends Component {
         $this->validate([
             'name' => 'required|string|max:255',
             'short_name' => 'nullable|string|max:50',
-            'logo' => 'nullable|string',
+            'logo' => 'nullable|image|max:5120',
             'coach_name' => 'nullable|string|max:255',
             'contact' => 'nullable|string|max:20',
             'address' => 'nullable|string',
@@ -287,22 +287,7 @@ new class extends Component {
                     </button>
                 </div>
 
-                <form x-data @submit.prevent="
-                    $refs.mcSubmitBtn.disabled = true;
-                    $refs.mcSubmitText.classList.add('hidden');
-                    $refs.mcLoadingText.classList.remove('hidden');
-                    @this.call('save').then(() => {
-                        setTimeout(() => {
-                            $refs.mcSubmitBtn.disabled = false;
-                            $refs.mcSubmitText.classList.remove('hidden');
-                            $refs.mcLoadingText.classList.add('hidden');
-                        }, 1000);
-                    }).catch(() => {
-                        $refs.mcSubmitBtn.disabled = false;
-                        $refs.mcSubmitText.classList.remove('hidden');
-                        $refs.mcLoadingText.classList.add('hidden');
-                    });
-                " class="p-8">
+                <form wire:submit.prevent="save" class="p-8">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="md:col-span-2 flex justify-center mb-4">
                             <div class="relative group">
@@ -316,7 +301,7 @@ new class extends Component {
                                 <label
                                     class="absolute -bottom-2 -right-2 bg-ksc-blue text-white p-3 rounded-2xl shadow-xl cursor-pointer hover:bg-blue-700 transition">
                                     <x-lucide-camera class="w-5 h-5" />
-                                    <input type="file" id="mc_logo" class="hidden" accept="image/*" onchange="previewSingleImage(this, 'preview_mc_logo', 'placeholder_mc_logo'); readAndSetBase64(this, base64 => @this.set('logo', base64))">
+                                    <input type="file" id="mc_logo" wire:model="logo" class="hidden" accept="image/*" onchange="previewSingleImage(this, 'preview_mc_logo', 'placeholder_mc_logo')">
                                 </label>
                             </div>
                         </div>

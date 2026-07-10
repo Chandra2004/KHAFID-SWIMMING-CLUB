@@ -668,9 +668,9 @@
                                                     <label
                                                         class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Unggah Bukti Transfer</label>
                                                     <div class="relative group cursor-pointer">
-                                                        <input type="file" id="payment_proof_input"
+                                                        <input type="file" id="payment_proof_input" wire:model="create_payment_proof"
                                                             accept="image/*"
-                                                            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" required onchange="previewSingleImage(this, 'preview-payment-proof', 'placeholder-payment-proof'); readAndSetBase64(this, base64 => @this.set('create_payment_proof', base64))">
+                                                            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" required onchange="previewSingleImage(this, 'preview-payment-proof', 'placeholder-payment-proof')">
                                                         
                                                         <!-- Tambahkan wire:ignore agar DOM tidak di-reset oleh Livewire saat re-render -->
                                                         <div wire:ignore
