@@ -784,21 +784,14 @@
                                                     <label
                                                         class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Unggah
                                                         Bukti Transfer</label>
-                                                    <div class="relative group cursor-pointer" x-data="singleUpload()">
+                                                    <div class="relative group cursor-pointer">
                                                         <input type="file" wire:model="create_payment_proof"
                                                             accept="image/*"
                                                             class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
-                                                            required
-                                                            @change="previewImage">
+                                                            required>
 
-                                                        <div wire:ignore
-                                                            class="w-full h-32 bg-white border-2 border-dashed border-slate-200 group-hover:border-blue-400 group-hover:bg-blue-50/30 rounded-2xl flex flex-col items-center justify-center transition-all relative z-10 overflow-hidden">
-
-                                                            <img x-show="imageUrl" :src="imageUrl"
-                                                                class="absolute inset-0 w-full h-full object-cover opacity-75">
-
-                                                            <div x-show="!imageUrl"
-                                                                class="flex flex-col items-center justify-center pointer-events-none z-10">
+                                                        <div class="w-full h-32 bg-white border-2 border-dashed border-slate-200 group-hover:border-blue-400 group-hover:bg-blue-50/30 rounded-2xl flex flex-col items-center justify-center transition-all relative z-10 overflow-hidden">
+                                                            <div class="flex flex-col items-center justify-center pointer-events-none z-10">
                                                                 <x-lucide-camera
                                                                     class="w-8 h-8 text-slate-300 group-hover:text-blue-400 transition-colors mb-2" />
                                                                 <span

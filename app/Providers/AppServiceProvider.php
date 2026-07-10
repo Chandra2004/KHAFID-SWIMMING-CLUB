@@ -35,14 +35,8 @@ class AppServiceProvider extends ServiceProvider
         putenv('TMPDIR=' . $tmpDir);
         @ini_set('sys_temp_dir', $tmpDir);
         @ini_set('upload_tmp_dir', $tmpDir);
-        // -------------------------------------
-
-        $isLocal = in_array(request()->getHost(), ['127.0.0.1', 'localhost']) || str_contains(request()->getHost(), '.test');
-        if (!$isLocal || str_starts_with(config('app.url'), 'https://')) {
+        if (str_starts_with(config('app.url'), 'https://')) {
             \Illuminate\Support\Facades\URL::forceScheme('https');
-            $_SERVER['HTTPS'] = 'on';
-            request()->server->set('HTTPS', 'on');
-            request()->server->set('SERVER_PORT', 443);
         }
         
         View::composer('*', function ($view) {

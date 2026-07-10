@@ -619,41 +619,43 @@ new class extends Component {
                                                         class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Logo
                                                         Event (Kiri & Kanan)</label>
                                                     <div class="grid grid-cols-2 gap-4">
-                                                        <div wire:ignore x-data="singleUpload('{{ $existingLogoLeft ? asset($existingLogoLeft) : '' }}')"
-                                                            class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue">
+                                                        <div class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue">
                                                             <div
                                                                 class="absolute inset-0 w-full h-full z-0 pointer-events-none">
-                                                                <img x-show="imageUrl" :src="imageUrl" class="w-full h-full object-cover">
+                                                                @if($existingLogoLeft)
+                                                                    <img src="{{ asset($existingLogoLeft) }}" class="w-full h-full object-cover">
+                                                                @endif
                                                             </div>
-                                                            <div x-show="!imageUrl"
-                                                                class="text-center relative z-10 pointer-events-none">
+                                                            @if(!$existingLogoLeft)
+                                                            <div class="text-center relative z-10 pointer-events-none">
                                                                 <x-lucide-award
                                                                     class="w-6 h-6 text-slate-300 group-hover:text-ksc-blue transition mb-2" />
                                                                 <span
                                                                     class="text-[9px] font-black text-slate-400 uppercase tracking-widest group-hover:text-ksc-blue transition">Logo
                                                                     Kiri</span>
                                                             </div>
+                                                            @endif
                                                             <input type="file" wire:model="logo_left" accept="image/*"
-                                                                class="absolute inset-0 opacity-0 cursor-pointer z-30"
-                                                                @change="previewImage">
+                                                                class="absolute inset-0 opacity-0 cursor-pointer z-30">
                                                         </div>
-                                                        <div wire:ignore x-data="singleUpload('{{ $existingLogoRight ? asset($existingLogoRight) : '' }}')"
-                                                            class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue">
+                                                        <div class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue">
                                                             <div
                                                                 class="absolute inset-0 w-full h-full z-0 pointer-events-none">
-                                                                <img x-show="imageUrl" :src="imageUrl" class="w-full h-full object-cover">
+                                                                @if($existingLogoRight)
+                                                                    <img src="{{ asset($existingLogoRight) }}" class="w-full h-full object-cover">
+                                                                @endif
                                                             </div>
-                                                            <div x-show="!imageUrl"
-                                                                class="text-center relative z-10 pointer-events-none">
+                                                            @if(!$existingLogoRight)
+                                                            <div class="text-center relative z-10 pointer-events-none">
                                                                 <x-lucide-award
                                                                     class="w-6 h-6 text-slate-300 group-hover:text-ksc-blue transition mb-2" />
                                                                 <span
                                                                     class="text-[9px] font-black text-slate-400 uppercase tracking-widest group-hover:text-ksc-blue transition">Logo
                                                                     Kanan</span>
                                                             </div>
+                                                            @endif
                                                             <input type="file" wire:model="logo_right" accept="image/*"
-                                                                class="absolute inset-0 opacity-0 cursor-pointer z-30"
-                                                                @change="previewImage">
+                                                                class="absolute inset-0 opacity-0 cursor-pointer z-30">
                                                         </div>
                                                     </div>
                                                     <div class="flex justify-between mt-1">
@@ -671,23 +673,24 @@ new class extends Component {
                                                     <label
                                                         class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Banner
                                                         Event</label>
-                                                    <div wire:ignore x-data="singleUpload('{{ $existingBanner ? asset($existingBanner) : '' }}')"
-                                                        class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue">
+                                                    <div class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue">
                                                         <div
                                                             class="absolute inset-0 w-full h-full z-0 pointer-events-none">
-                                                            <img x-show="imageUrl" :src="imageUrl" class="w-full h-full object-cover">
+                                                            @if($existingBanner)
+                                                                <img src="{{ asset($existingBanner) }}" class="w-full h-full object-cover">
+                                                            @endif
                                                         </div>
-                                                        <div x-show="!imageUrl"
-                                                            class="text-center relative z-10 pointer-events-none">
+                                                        @if(!$existingBanner)
+                                                        <div class="text-center relative z-10 pointer-events-none">
                                                             <x-lucide-image
                                                                 class="w-6 h-6 text-slate-300 group-hover:text-ksc-blue transition mb-2" />
                                                             <span
                                                                 class="text-[9px] font-black text-slate-400 uppercase tracking-widest group-hover:text-ksc-blue transition">Unggah
                                                                 Banner</span>
                                                         </div>
+                                                        @endif
                                                         <input type="file" wire:model="banner" accept="image/*"
-                                                            class="absolute inset-0 opacity-0 cursor-pointer z-30"
-                                                            @change="previewImage">
+                                                            class="absolute inset-0 opacity-0 cursor-pointer z-30">
                                                     </div>
                                                     @error('banner')
                                                         <span

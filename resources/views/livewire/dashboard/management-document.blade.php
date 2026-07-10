@@ -430,16 +430,18 @@ new class extends Component {
                                     <label
                                         class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Logo
                                         Kiri</label>
-                                    <div wire:ignore class="flex items-center gap-4" x-data="singleUpload('{{ $existingLogoLeft ? asset('storage/' . $existingLogoLeft) : '' }}')">
+                                    <div class="flex items-center gap-4">
                                         <div id="preview_md_logo_left_wrap" class="flex items-center">
-                                            <img x-show="imageUrl" :src="imageUrl" class="w-20 h-20 object-contain rounded-xl border border-slate-100">
-                                            <div x-show="!imageUrl" class="w-20 h-20 bg-slate-50 rounded-xl flex items-center justify-center border-2 border-dashed border-slate-200">
-                                                <x-lucide-image class="w-8 h-8 text-slate-300" />
-                                            </div>
+                                            @if($existingLogoLeft)
+                                                <img src="{{ asset('storage/' . $existingLogoLeft) }}" class="w-20 h-20 object-contain rounded-xl border border-slate-100">
+                                            @else
+                                                <div class="w-20 h-20 bg-slate-50 rounded-xl flex items-center justify-center border-2 border-dashed border-slate-200">
+                                                    <x-lucide-image class="w-8 h-8 text-slate-300" />
+                                                </div>
+                                            @endif
                                         </div>
                                         <input type="file" wire:model="logo_left"
-                                            class="text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                                            @change="previewImage">
+                                            class="text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
                                     </div>
                                     @error('logo_left')
                                         <span class="text-[10px] text-rose-500 font-bold ml-1">{{ $message }}</span>
@@ -450,16 +452,18 @@ new class extends Component {
                                     <label
                                         class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Logo
                                         Kanan</label>
-                                    <div wire:ignore class="flex items-center gap-4" x-data="singleUpload('{{ $existingLogoRight ? asset('storage/' . $existingLogoRight) : '' }}')">
+                                    <div class="flex items-center gap-4">
                                         <div id="preview_md_logo_right_wrap" class="flex items-center">
-                                            <img x-show="imageUrl" :src="imageUrl" class="w-20 h-20 object-contain rounded-xl border border-slate-100">
-                                            <div x-show="!imageUrl" class="w-20 h-20 bg-slate-50 rounded-xl flex items-center justify-center border-2 border-dashed border-slate-200">
-                                                <x-lucide-image class="w-8 h-8 text-slate-300" />
-                                            </div>
+                                            @if($existingLogoRight)
+                                                <img src="{{ asset('storage/' . $existingLogoRight) }}" class="w-20 h-20 object-contain rounded-xl border border-slate-100">
+                                            @else
+                                                <div class="w-20 h-20 bg-slate-50 rounded-xl flex items-center justify-center border-2 border-dashed border-slate-200">
+                                                    <x-lucide-image class="w-8 h-8 text-slate-300" />
+                                                </div>
+                                            @endif
                                         </div>
                                         <input type="file" wire:model="logo_right"
-                                            class="text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                                            @change="previewImage">
+                                            class="text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
                                     </div>
                                     @error('logo_right')
                                         <span class="text-[10px] text-rose-500 font-bold ml-1">{{ $message }}</span>

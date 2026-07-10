@@ -343,19 +343,20 @@ new class extends Component {
                             <label
                                 class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2 ml-1 text-center">Gambar
                                 / QRIS (Optional)</label>
-                            <div class="flex items-center justify-center gap-6" x-data="singleUpload('{{ $existingImage ? asset($existingImage) : '' }}')">
-                                <div wire:ignore
-                                    class="w-32 h-32 bg-slate-50 rounded-[2rem] overflow-hidden border-4 border-white shadow-xl flex items-center justify-center relative">
-                                    <img x-show="imageUrl" :src="imageUrl" class="w-full h-full object-cover">
-                                    <div x-show="!imageUrl"
-                                        class="flex items-center justify-center w-full h-full absolute inset-0">
-                                        <x-lucide-qr-code class="w-10 h-10 text-slate-300" />
-                                    </div>
+                            <div class="flex items-center justify-center gap-6">
+                                <div class="w-32 h-32 bg-slate-50 rounded-[2rem] overflow-hidden border-4 border-white shadow-xl flex items-center justify-center relative">
+                                    @if($existingImage)
+                                        <img src="{{ asset($existingImage) }}" class="w-full h-full object-cover">
+                                    @else
+                                        <div class="flex items-center justify-center w-full h-full absolute inset-0">
+                                            <x-lucide-qr-code class="w-10 h-10 text-slate-300" />
+                                        </div>
+                                    @endif
                                 </div>
                                 <label
                                     class="bg-emerald-600 text-white px-6 py-3 rounded-2xl shadow-xl shadow-emerald-100 cursor-pointer hover:bg-emerald-700 transition font-bold text-xs">
                                     Upload QRIS/Image
-                                    <input type="file" wire:model="image" class="hidden" accept="image/*" @change="previewImage">
+                                    <input type="file" wire:model="image" class="hidden" accept="image/*">
                                 </label>
                             </div>
                             @error('image')

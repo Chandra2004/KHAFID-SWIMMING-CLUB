@@ -291,19 +291,20 @@ new class extends Component {
                 <form wire:submit.prevent="save"
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="md:col-span-2 flex justify-center mb-4">
-                            <div class="relative group" x-data="singleUpload('{{ $existingLogo ? asset($existingLogo) : '' }}')">
-                                <div wire:ignore
-                                    class="w-32 h-32 bg-slate-50 rounded-[2rem] overflow-hidden border-4 border-white shadow-xl flex items-center justify-center relative">
-                                    <img x-show="imageUrl" :src="imageUrl" class="w-full h-full object-cover">
-                                    <div x-show="!imageUrl"
-                                        class="flex items-center justify-center w-full h-full absolute inset-0">
-                                        <x-lucide-image class="w-10 h-10 text-slate-300" />
-                                    </div>
+                            <div class="relative group">
+                                <div class="w-32 h-32 bg-slate-50 rounded-[2rem] overflow-hidden border-4 border-white shadow-xl flex items-center justify-center relative">
+                                    @if($existingLogo)
+                                        <img src="{{ asset($existingLogo) }}" class="w-full h-full object-cover">
+                                    @else
+                                        <div class="flex items-center justify-center w-full h-full absolute inset-0">
+                                            <x-lucide-image class="w-10 h-10 text-slate-300" />
+                                        </div>
+                                    @endif
                                 </div>
                                 <label
                                     class="absolute -bottom-2 -right-2 bg-ksc-blue text-white p-3 rounded-2xl shadow-xl cursor-pointer hover:bg-blue-700 transition">
                                     <x-lucide-camera class="w-5 h-5" />
-                                    <input type="file" wire:model="logo" class="hidden" accept="image/*" @change="previewImage">
+                                    <input type="file" wire:model="logo" class="hidden" accept="image/*">
                                 </label>
                             </div>
                         </div>

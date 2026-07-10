@@ -882,35 +882,39 @@ new class extends Component {
                                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
                                     <div>
                                         <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Foto Profil</label>
-                                        <div wire:ignore class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue" x-data="singleUpload('{{ $existing_foto_profil ? asset($existing_foto_profil) : '' }}')">
+                                        <div class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue">
                                             <div class="absolute inset-0 w-full h-full z-0 pointer-events-none">
-                                                <img x-show="imageUrl" :src="imageUrl" class="w-full h-full object-cover">
+                                                @if($existing_foto_profil)
+                                                    <img src="{{ asset($existing_foto_profil) }}" class="w-full h-full object-cover">
+                                                @endif
                                             </div>
                                             
-                                            <div x-show="!imageUrl" class="text-center relative z-10 pointer-events-none">
+                                            @if(!$existing_foto_profil)
+                                            <div class="text-center relative z-10 pointer-events-none">
                                                 <x-lucide-camera class="w-6 h-6 text-slate-300 mx-auto mb-2" />
                                                 <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block">Upload Foto</span>
                                             </div>
+                                            @endif
                                             
                                             <div class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 z-20">
                                                 <label class="p-2 bg-white rounded-lg cursor-pointer hover:scale-110 transition active:scale-95" title="Galeri">
                                                     <x-lucide-image class="w-4 h-4 text-slate-700" />
-                                                    <input type="file" wire:model="foto_profil" class="hidden" accept=".jpg,.jpeg,.png,.webp" @change="previewImage">
+                                                    <input type="file" wire:model="foto_profil" class="hidden" accept=".jpg,.jpeg,.png,.webp">
                                                 </label>
                                                 <label class="p-2 bg-white rounded-lg cursor-pointer hover:scale-110 transition active:scale-95" title="Kamera">
                                                     <x-lucide-camera class="w-4 h-4 text-slate-700" />
-                                                    <input type="file" wire:model="foto_profil" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="user" @change="previewImage">
+                                                    <input type="file" wire:model="foto_profil" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="user">
                                                 </label>
                                             </div>
                                             {{-- Mobile View --}}
                                             <div class="absolute bottom-1 flex gap-1 md:hidden z-20">
                                                 <label class="p-1.5 bg-white/90 rounded-md shadow">
                                                     <x-lucide-image class="w-3.5 h-3.5 text-slate-600" />
-                                                    <input type="file" wire:model="foto_profil" class="hidden" accept=".jpg,.jpeg,.png,.webp" @change="previewImage">
+                                                    <input type="file" wire:model="foto_profil" class="hidden" accept=".jpg,.jpeg,.png,.webp">
                                                 </label>
                                                 <label class="p-1.5 bg-white/90 rounded-md shadow">
                                                     <x-lucide-camera class="w-3.5 h-3.5 text-slate-600" />
-                                                    <input type="file" wire:model="foto_profil" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="user" @change="previewImage">
+                                                    <input type="file" wire:model="foto_profil" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="user">
                                                 </label>
                                             </div>
                                         </div>
@@ -918,35 +922,39 @@ new class extends Component {
                                     </div>
                                     <div>
                                         <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Foto KTP</label>
-                                        <div wire:ignore class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue" x-data="singleUpload('{{ $existing_foto_ktp ? route('document.view', ['type' => 'ktp', 'filename' => basename($existing_foto_ktp) ?: 'none']) : '' }}')">
+                                        <div class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue">
                                             <div class="absolute inset-0 w-full h-full z-0 pointer-events-none">
-                                                <img x-show="imageUrl" :src="imageUrl" class="w-full h-full object-cover">
+                                                @if($existing_foto_ktp)
+                                                    <img src="{{ route('document.view', ['type' => 'ktp', 'filename' => basename($existing_foto_ktp)]) }}" class="w-full h-full object-cover">
+                                                @endif
                                             </div>
                                             
-                                            <div x-show="!imageUrl" class="text-center relative z-10 pointer-events-none">
+                                            @if(!$existing_foto_ktp)
+                                            <div class="text-center relative z-10 pointer-events-none">
                                                 <x-lucide-image-plus class="w-6 h-6 text-slate-300 mx-auto mb-2" />
                                                 <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block">Upload KTP</span>
                                             </div>
+                                            @endif
                                             
                                             <div class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 z-20">
                                                 <label class="p-2 bg-white rounded-lg cursor-pointer hover:scale-110 transition active:scale-95" title="Galeri">
                                                     <x-lucide-image class="w-4 h-4 text-slate-700" />
-                                                    <input type="file" wire:model="foto_ktp" class="hidden" accept=".jpg,.jpeg,.png,.webp" @change="previewImage">
+                                                    <input type="file" wire:model="foto_ktp" class="hidden" accept=".jpg,.jpeg,.png,.webp">
                                                 </label>
                                                 <label class="p-2 bg-white rounded-lg cursor-pointer hover:scale-110 transition active:scale-95" title="Kamera">
                                                     <x-lucide-camera class="w-4 h-4 text-slate-700" />
-                                                    <input type="file" wire:model="foto_ktp" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" @change="previewImage">
+                                                    <input type="file" wire:model="foto_ktp" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment">
                                                 </label>
                                             </div>
                                             {{-- Mobile View --}}
                                             <div class="absolute bottom-1 flex gap-1 md:hidden z-20">
                                                 <label class="p-1.5 bg-white/90 rounded-md shadow">
                                                     <x-lucide-image class="w-3.5 h-3.5 text-slate-600" />
-                                                    <input type="file" wire:model="foto_ktp" class="hidden" accept=".jpg,.jpeg,.png,.webp" @change="previewImage">
+                                                    <input type="file" wire:model="foto_ktp" class="hidden" accept=".jpg,.jpeg,.png,.webp">
                                                 </label>
                                                 <label class="p-1.5 bg-white/90 rounded-md shadow">
                                                     <x-lucide-camera class="w-3.5 h-3.5 text-slate-600" />
-                                                    <input type="file" wire:model="foto_ktp" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" @change="previewImage">
+                                                    <input type="file" wire:model="foto_ktp" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment">
                                                 </label>
                                             </div>
                                         </div>
@@ -954,35 +962,39 @@ new class extends Component {
                                     </div>
                                     <div>
                                         <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Foto Akta</label>
-                                        <div wire:ignore class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue" x-data="singleUpload('{{ $existing_foto_akta ? route('document.view', ['type' => 'akta', 'filename' => basename($existing_foto_akta) ?: 'none']) : '' }}')">
+                                        <div class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue">
                                             <div class="absolute inset-0 w-full h-full z-0 pointer-events-none">
-                                                <img x-show="imageUrl" :src="imageUrl" class="w-full h-full object-cover">
+                                                @if($existing_foto_akta)
+                                                    <img src="{{ route('document.view', ['type' => 'akta', 'filename' => basename($existing_foto_akta)]) }}" class="w-full h-full object-cover">
+                                                @endif
                                             </div>
                                             
-                                            <div x-show="!imageUrl" class="text-center relative z-10 pointer-events-none">
+                                            @if(!$existing_foto_akta)
+                                            <div class="text-center relative z-10 pointer-events-none">
                                                 <x-lucide-file-plus class="w-6 h-6 text-slate-300 mx-auto mb-2" />
                                                 <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block">Upload Akta</span>
                                             </div>
+                                            @endif
                                             
                                             <div class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 z-20">
                                                 <label class="p-2 bg-white rounded-lg cursor-pointer hover:scale-110 transition active:scale-95" title="Galeri">
                                                     <x-lucide-image class="w-4 h-4 text-slate-700" />
-                                                    <input type="file" wire:model="foto_akta" class="hidden" accept=".jpg,.jpeg,.png,.webp" @change="previewImage">
+                                                    <input type="file" wire:model="foto_akta" class="hidden" accept=".jpg,.jpeg,.png,.webp">
                                                 </label>
                                                 <label class="p-2 bg-white rounded-lg cursor-pointer hover:scale-110 transition active:scale-95" title="Kamera">
                                                     <x-lucide-camera class="w-4 h-4 text-slate-700" />
-                                                    <input type="file" wire:model="foto_akta" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" @change="previewImage">
+                                                    <input type="file" wire:model="foto_akta" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment">
                                                 </label>
                                             </div>
                                             {{-- Mobile View --}}
                                             <div class="absolute bottom-1 flex gap-1 md:hidden z-20">
                                                 <label class="p-1.5 bg-white/90 rounded-md shadow">
                                                     <x-lucide-image class="w-3.5 h-3.5 text-slate-600" />
-                                                    <input type="file" wire:model="foto_akta" class="hidden" accept=".jpg,.jpeg,.png,.webp" @change="previewImage">
+                                                    <input type="file" wire:model="foto_akta" class="hidden" accept=".jpg,.jpeg,.png,.webp">
                                                 </label>
                                                 <label class="p-1.5 bg-white/90 rounded-md shadow">
                                                     <x-lucide-camera class="w-3.5 h-3.5 text-slate-600" />
-                                                    <input type="file" wire:model="foto_akta" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" @change="previewImage">
+                                                    <input type="file" wire:model="foto_akta" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment">
                                                 </label>
                                             </div>
                                         </div>
@@ -990,35 +1002,39 @@ new class extends Component {
                                     </div>
                                     <div>
                                         <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Foto KK</label>
-                                        <div wire:ignore class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue" x-data="singleUpload('{{ $existing_foto_kk ? route('document.view', ['type' => 'kk', 'filename' => basename($existing_foto_kk) ?: 'none']) : '' }}')">
+                                        <div class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue">
                                             <div class="absolute inset-0 w-full h-full z-0 pointer-events-none">
-                                                <img x-show="imageUrl" :src="imageUrl" class="w-full h-full object-cover">
+                                                @if($existing_foto_kk)
+                                                    <img src="{{ route('document.view', ['type' => 'kk', 'filename' => basename($existing_foto_kk)]) }}" class="w-full h-full object-cover">
+                                                @endif
                                             </div>
                                             
-                                            <div x-show="!imageUrl" class="text-center relative z-10 pointer-events-none">
+                                            @if(!$existing_foto_kk)
+                                            <div class="text-center relative z-10 pointer-events-none">
                                                 <x-lucide-users class="w-6 h-6 text-slate-300 mx-auto mb-2" />
                                                 <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest block">Upload KK</span>
                                             </div>
+                                            @endif
                                             
                                             <div class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 z-20">
                                                 <label class="p-2 bg-white rounded-lg cursor-pointer hover:scale-110 transition active:scale-95" title="Galeri">
                                                     <x-lucide-image class="w-4 h-4 text-slate-700" />
-                                                    <input type="file" wire:model="foto_kk" class="hidden" accept=".jpg,.jpeg,.png,.webp" @change="previewImage">
+                                                    <input type="file" wire:model="foto_kk" class="hidden" accept=".jpg,.jpeg,.png,.webp">
                                                 </label>
                                                 <label class="p-2 bg-white rounded-lg cursor-pointer hover:scale-110 transition active:scale-95" title="Kamera">
                                                     <x-lucide-camera class="w-4 h-4 text-slate-700" />
-                                                    <input type="file" wire:model="foto_kk" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" @change="previewImage">
+                                                    <input type="file" wire:model="foto_kk" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment">
                                                 </label>
                                             </div>
                                             {{-- Mobile View --}}
                                             <div class="absolute bottom-1 flex gap-1 md:hidden z-20">
                                                 <label class="p-1.5 bg-white/90 rounded-md shadow">
                                                     <x-lucide-image class="w-3.5 h-3.5 text-slate-600" />
-                                                    <input type="file" wire:model="foto_kk" class="hidden" accept=".jpg,.jpeg,.png,.webp" @change="previewImage">
+                                                    <input type="file" wire:model="foto_kk" class="hidden" accept=".jpg,.jpeg,.png,.webp">
                                                 </label>
                                                 <label class="p-1.5 bg-white/90 rounded-md shadow">
                                                     <x-lucide-camera class="w-3.5 h-3.5 text-slate-600" />
-                                                    <input type="file" wire:model="foto_kk" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment" @change="previewImage">
+                                                    <input type="file" wire:model="foto_kk" class="hidden" accept=".jpg,.jpeg,.png,.webp" capture="environment">
                                                 </label>
                                             </div>
                                         </div>

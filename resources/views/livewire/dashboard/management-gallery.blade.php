@@ -523,32 +523,31 @@ new class extends Component {
                                         class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-4 ml-1 text-center">Album
                                         Cover</label>
                                     <div class="flex flex-col items-center gap-4">
-                                        <div wire:ignore
-                                            class="w-full h-40 bg-slate-50 rounded-[2rem] overflow-hidden border-4 border-white shadow-xl flex items-center justify-center relative"
-                                            x-data="singleUpload('{{ $existingCover ? asset($existingCover) : '' }}')">
+                                        <div class="w-full h-40 bg-slate-50 rounded-[2rem] overflow-hidden border-4 border-white shadow-xl flex items-center justify-center relative">
                                             
-                                            <img x-show="imageUrl" :src="imageUrl" class="w-full h-full object-cover">
-                                            
-                                            <div x-show="!imageUrl" class="flex items-center justify-center w-full h-full">
-                                                <x-lucide-image class="w-10 h-10 text-slate-300" />
-                                            </div>
+                                            @if($existingCover)
+                                                <img src="{{ asset($existingCover) }}" class="w-full h-full object-cover">
+                                            @else
+                                                <div class="flex items-center justify-center w-full h-full">
+                                                    <x-lucide-image class="w-10 h-10 text-slate-300" />
+                                                </div>
+                                            @endif
                                             
                                             <label class="absolute bottom-4 bg-slate-900 text-white px-6 py-3 rounded-2xl cursor-pointer hover:bg-slate-800 transition font-bold text-[10px] uppercase tracking-[0.2em] shadow-lg">
                                                 Ganti Sampul
-                                                <input type="file" wire:model="cover" class="hidden" accept="image/*" @change="previewImage">
+                                                <input type="file" wire:model="cover" class="hidden" accept="image/*">
                                             </label>
                                         </div>
                                     </div>
                                 </div>
 
                                 {{-- Photos Upload --}}
-                                <div x-data="multiUpload()">
+                                <div>
                                     <div class="flex justify-between items-center mb-4 px-1">
                                         <div>
                                             <label
                                                 class="block text-xs font-black text-slate-400 uppercase tracking-widest">
                                                 Koleksi Foto
-                                                <span class="text-indigo-600 ml-1" x-show="images.length > 0" x-text="'(' + images.length + ' Terpilih)'"></span>
                                             </label>
                                             <p class="text-[9px] font-bold text-slate-300 uppercase mt-1">Maksimal 50
                                                 foto per upload</p>
@@ -557,8 +556,7 @@ new class extends Component {
                                             class="text-indigo-600 font-black text-[10px] uppercase tracking-widest cursor-pointer hover:underline">
                                             + Tambah Foto
                                             <input type="file" wire:model="photos" class="hidden" accept="image/*"
-                                                multiple
-                                                @change="previewImages">
+                                                multiple>
                                         </label>
                                     </div>
 
@@ -579,15 +577,6 @@ new class extends Component {
                                                     </button>
                                                 </div>
                                             @endforeach
-                                            
-                                            <template x-for="(img, index) in images" :key="index">
-                                                <div class="relative group aspect-square rounded-xl overflow-hidden border-2 border-slate-200 shadow-sm opacity-70">
-                                                    <img :src="img" class="w-full h-full object-cover">
-                                                    <div class="absolute inset-0 bg-slate-900/10 flex items-center justify-center">
-                                                        <x-lucide-loader-2 class="w-5 h-5 text-white animate-spin drop-shadow-md" />
-                                                    </div>
-                                                </div>
-                                            </template>
                                         </div>
 
                                         @if (empty($existingPhotos))
