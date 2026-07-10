@@ -413,7 +413,8 @@ class EventDetail extends Component
         }
         
         $availableUsers = [];
-        if (\Illuminate\Support\Facades\Auth::check() && \Illuminate\Support\Facades\Gate::allows('master-pendaftaran.create')) {
+        $authUser = \Illuminate\Support\Facades\Auth::user();
+        if ($authUser instanceof \App\Models\User && $authUser->can('master-pendaftaran.create')) {
              $availableUsers = $usersQuery->take(50)->get();
         }
 
