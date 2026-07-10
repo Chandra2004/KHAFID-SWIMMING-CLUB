@@ -37,7 +37,8 @@ class AppServiceProvider extends ServiceProvider
         @ini_set('upload_tmp_dir', $tmpDir);
         // -------------------------------------
 
-        if (str_starts_with(config('app.url'), 'https://')) {
+        $isLocal = in_array(request()->getHost(), ['127.0.0.1', 'localhost']) || str_contains(request()->getHost(), '.test');
+        if (!$isLocal || str_starts_with(config('app.url'), 'https://')) {
             \Illuminate\Support\Facades\URL::forceScheme('https');
             $_SERVER['HTTPS'] = 'on';
         }
