@@ -43,8 +43,9 @@ new class extends Component {
         $eventsQuery = Event::with('categories');
 
         if ($this->search) {
-            $eventsQuery->where(function ($q) {
-                $q->where('name', 'like', '%' . $this->search . '%')->orWhere('location', 'like', '%' . $this->search . '%');
+            $eventsQuery->where(function($q) {
+                $q->where('name', 'like', '%' . $this->search . '%')
+                  ->orWhere('location', 'like', '%' . $this->search . '%');
             });
         }
 
@@ -62,7 +63,7 @@ new class extends Component {
         return [
             'events' => $eventsQuery->latest()->paginate(12),
             'stats' => $stats,
-            'financeAccounts' => \App\Models\FinanceAccount::where('is_active', true)->get(),
+            'financeAccounts' => \App\Models\FinanceAccount::where('is_active', true)->get()
         ];
     }
 
@@ -173,7 +174,7 @@ new class extends Component {
         $this->showModal = false;
         $this->dispatch('notification', [
             'status' => 'success',
-            'message' => $message,
+            'message' => $message
         ]);
     }
 
@@ -188,22 +189,16 @@ new class extends Component {
         $this->authorize('master-event.delete');
         $event = $this->eventToDelete;
         if ($event) {
-            if ($event->banner) {
-                @unlink(public_path($event->banner));
-            }
-            if ($event->logo_left) {
-                @unlink(public_path($event->logo_left));
-            }
-            if ($event->logo_right) {
-                @unlink(public_path($event->logo_right));
-            }
+            if ($event->banner) @unlink(public_path($event->banner));
+            if ($event->logo_left) @unlink(public_path($event->logo_left));
+            if ($event->logo_right) @unlink(public_path($event->logo_right));
 
             $event->delete();
             $this->showDeleteModal = false;
             $this->eventToDelete = null;
             $this->dispatch('notification', [
                 'status' => 'success',
-                'message' => 'Event berhasil dihapus',
+                'message' => 'Event berhasil dihapus'
             ]);
         }
     }
@@ -214,8 +209,7 @@ new class extends Component {
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
         <div>
             <h2 class="text-3xl font-black text-slate-900 tracking-tighter uppercase leading-none">Master Event</h2>
-            <p class="text-sm text-slate-500 font-medium mt-2 uppercase tracking-widest italic">Kelola kompetisi renang &
-                agenda klub</p>
+            <p class="text-sm text-slate-500 font-medium mt-2 uppercase tracking-widest italic">Kelola kompetisi renang & agenda klub</p>
         </div>
         @can('master-event.create')
             <button wire:click="openCreateModal"
@@ -259,13 +253,11 @@ new class extends Component {
     <div class="flex flex-col md:flex-row gap-4 mb-8">
         <div class="flex-1 relative">
             <x-lucide-search class="w-5 h-5 absolute left-5 top-1/2 -translate-y-1/2 text-slate-300" />
-            <input type="text" wire:model.live.debounce.300ms="search"
-                placeholder="Cari nama event atau lokasi kegiatan..."
+            <input type="text" wire:model.live.debounce.300ms="search" placeholder="Cari nama event atau lokasi kegiatan..."
                 class="w-full pl-14 pr-6 py-4 bg-white border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-blue-50 outline-none transition shadow-sm">
         </div>
         <div class="w-full md:w-64 relative">
-            <select wire:model.live="filterStatus"
-                class="w-full pl-6 pr-12 py-4 bg-white border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-blue-50 outline-none transition appearance-none shadow-sm uppercase tracking-widest">
+            <select wire:model.live="filterStatus" class="w-full pl-6 pr-12 py-4 bg-white border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-blue-50 outline-none transition appearance-none shadow-sm uppercase tracking-widest">
                 <option value="">Semua Status</option>
                 <option value="draft">Draft</option>
                 <option value="upcoming">Upcoming</option>
@@ -273,8 +265,7 @@ new class extends Component {
                 <option value="completed">Completed</option>
                 <option value="cancelled">Cancelled</option>
             </select>
-            <x-lucide-chevron-down
-                class="w-4 h-4 absolute right-6 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none" />
+            <x-lucide-chevron-down class="w-4 h-4 absolute right-6 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none" />
         </div>
     </div>
 
@@ -284,20 +275,12 @@ new class extends Component {
             <table class="w-full text-left border-collapse">
                 <thead class="bg-slate-50/50 border-b border-slate-100">
                     <tr>
-                        <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Informasi
-                            Event</th>
-                        <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Lokasi &
-                            Jadwal</th>
-                        <th
-                            class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">
-                            Kuota</th>
-                        <th
-                            class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">
-                            Status</th>
+                        <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Informasi Event</th>
+                        <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Lokasi & Jadwal</th>
+                        <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">Kuota</th>
+                        <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">Status</th>
                         @canany(['master-event.edit', 'master-event.delete', 'master-lomba.view'])
-                            <th
-                                class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">
-                                Aksi</th>
+                            <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">Aksi</th>
                         @endcanany
                     </tr>
                 </thead>
@@ -307,38 +290,28 @@ new class extends Component {
                             <td class="px-8 py-6">
                                 <div class="flex items-center gap-4">
                                     <div class="flex items-center -space-x-4">
-                                        <div
-                                            class="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 border border-slate-50 shrink-0 shadow-sm relative z-20">
-                                            @if ($event->logo_left)
-                                                <img src="{{ asset($event->logo_left) }}"
-                                                    class="w-full h-full object-cover">
+                                        <div class="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 border border-slate-50 shrink-0 shadow-sm relative z-20">
+                                            @if($event->logo_left)
+                                                <img src="{{ asset($event->logo_left) }}" class="w-full h-full object-cover">
                                             @else
-                                                <div
-                                                    class="w-full h-full flex items-center justify-center text-slate-300">
+                                                <div class="w-full h-full flex items-center justify-center text-slate-300">
                                                     <x-lucide-award class="w-5 h-5" />
                                                 </div>
                                             @endif
                                         </div>
-                                        <div
-                                            class="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 border border-slate-50 shrink-0 shadow-sm relative z-10">
-                                            @if ($event->logo_right)
-                                                <img src="{{ asset($event->logo_right) }}"
-                                                    class="w-full h-full object-cover">
+                                        <div class="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 border border-slate-50 shrink-0 shadow-sm relative z-10">
+                                            @if($event->logo_right)
+                                                <img src="{{ asset($event->logo_right) }}" class="w-full h-full object-cover">
                                             @else
-                                                <div
-                                                    class="w-full h-full flex items-center justify-center text-slate-300">
+                                                <div class="w-full h-full flex items-center justify-center text-slate-300">
                                                     <x-lucide-award class="w-5 h-5" />
                                                 </div>
                                             @endif
                                         </div>
                                     </div>
                                     <div>
-                                        <p
-                                            class="text-sm font-black text-slate-900 uppercase tracking-tight leading-tight">
-                                            {{ $event->name }}</p>
-                                        <p
-                                            class="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest italic">
-                                            UUID: {{ substr($event->uid, 0, 8) }}...</p>
+                                        <p class="text-sm font-black text-slate-900 uppercase tracking-tight leading-tight">{{ $event->name }}</p>
+                                        <p class="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest italic">UUID: {{ substr($event->uid, 0, 8) }}...</p>
                                     </div>
                                 </div>
                             </td>
@@ -346,27 +319,22 @@ new class extends Component {
                                 <div class="flex flex-col gap-1.5">
                                     <div class="flex items-center gap-2">
                                         <x-lucide-map-pin class="w-3.5 h-3.5 text-slate-300" />
-                                        <span
-                                            class="text-xs font-bold text-slate-600 tracking-tight">{{ $event->location ?? '-' }}</span>
+                                        <span class="text-xs font-bold text-slate-600 tracking-tight">{{ $event->location ?? '-' }}</span>
                                     </div>
                                     <div class="flex items-center gap-2">
                                         <x-lucide-calendar class="w-3.5 h-3.5 text-slate-300" />
-                                        <span
-                                            class="text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ $event->start_date ? $event->start_date->format('d F Y') : 'TBA' }}</span>
+                                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ $event->start_date ? $event->start_date->format('d F Y') : 'TBA' }}</span>
                                     </div>
                                 </div>
                             </td>
                             <td class="px-8 py-6 text-center">
                                 <div class="inline-flex flex-col">
-                                    <span
-                                        class="text-sm font-black text-slate-900">{{ $event->categories->sum(fn($cat) => (int) $event->lane_count * (int) $cat->total_series) }}</span>
-                                    <span
-                                        class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Peserta</span>
+                                    <span class="text-sm font-black text-slate-900">{{ $event->categories->sum(fn($cat) => (int)$event->lane_count * (int)$cat->total_series) }}</span>
+                                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Peserta</span>
                                 </div>
                             </td>
                             <td class="px-8 py-6 text-center">
-                                <span
-                                    class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border
+                                <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border
                                     {{ $event->status === 'draft' ? 'bg-slate-50 text-slate-500 border-slate-100' : '' }}
                                     {{ $event->status === 'upcoming' ? 'bg-blue-50 text-blue-600 border-blue-100' : '' }}
                                     {{ $event->status === 'ongoing' ? 'bg-amber-50 text-amber-600 border-amber-100' : '' }}
@@ -380,8 +348,7 @@ new class extends Component {
                                     <div class="flex justify-center gap-2">
                                         @can('master-lomba.view')
                                             <a href="{{ route('master.event.lomba', $event->uid) }}"
-                                                class="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition"
-                                                title="Kelola Lomba">
+                                                class="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition" title="Kelola Lomba">
                                                 <x-lucide-swatch-book class="w-5 h-5" />
                                             </a>
                                         @endcan
@@ -405,14 +372,11 @@ new class extends Component {
                         <tr>
                             <td colspan="5" class="px-8 py-20 text-center">
                                 <div class="flex flex-col items-center">
-                                    <div
-                                        class="w-20 h-20 bg-slate-50 rounded-[2.5rem] flex items-center justify-center mb-4">
+                                    <div class="w-20 h-20 bg-slate-50 rounded-[2.5rem] flex items-center justify-center mb-4">
                                         <x-lucide-calendar-x class="w-10 h-10 text-slate-200" />
                                     </div>
-                                    <h3 class="text-lg font-black text-slate-400 uppercase tracking-widest">Tidak ada
-                                        event</h3>
-                                    <p class="text-xs text-slate-300 font-bold mt-1">Gunakan tombol "Buat Event Baru"
-                                        untuk memulai</p>
+                                    <h3 class="text-lg font-black text-slate-400 uppercase tracking-widest">Tidak ada event</h3>
+                                    <p class="text-xs text-slate-300 font-bold mt-1">Gunakan tombol "Buat Event Baru" untuk memulai</p>
                                 </div>
                             </td>
                         </tr>
@@ -427,28 +391,26 @@ new class extends Component {
     </div>
 
     {{-- Modal Create/Edit --}}
-    @if ($showModal)
+    @if($showModal)
         <div class="fixed inset-0 z-[2000] overflow-y-auto px-4 py-6 sm:px-0 flex items-center justify-center">
             <div class="fixed inset-0 transform transition-all" wire:click="$set('showModal', false)">
                 <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
             </div>
 
-            <div
-                class="bg-white rounded-[2.5rem] overflow-hidden shadow-2xl transform transition-all sm:w-full sm:max-w-4xl z-[2010] border border-slate-100 flex flex-col h-full max-h-[90vh]">
+            <div class="bg-white rounded-[2.5rem] overflow-hidden shadow-2xl transform transition-all sm:w-full sm:max-w-4xl z-[2010] border border-slate-100 flex flex-col h-full max-h-[90vh]">
                 {{-- Modal Header --}}
                 <div class="p-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/30">
                     <h3 class="text-xl font-black text-slate-900 tracking-tighter uppercase">
                         {{ $modalMode === 'create' ? 'Tambah Event Baru' : 'Ubah Data Event' }}
                     </h3>
-                    <button wire:click="$set('showModal', false)"
-                        class="text-slate-400 hover:text-slate-600 transition">
+                    <button wire:click="$set('showModal', false)" class="text-slate-400 hover:text-slate-600 transition">
                         <x-lucide-x class="w-6 h-6" />
                     </button>
                 </div>
 
                 {{-- Modal Body --}}
                 <div class="flex-1 overflow-y-auto custom-scrollbar">
-                    <form wire:submit.prevent="save" id="eventForm" class="p-8">
+                    <form @submit.prevent id="eventForm" class="p-8">
                         <div class="space-y-8 px-2">
                             {{-- Section 1: Dasar --}}
                             <div class="bg-slate-50/50 rounded-3xl p-6 border border-slate-100">
@@ -456,299 +418,210 @@ new class extends Component {
                                     <div class="w-8 h-8 bg-blue-100 rounded-xl flex items-center justify-center">
                                         <x-lucide-award class="w-4 h-4 text-ksc-blue" />
                                     </div>
-                                    <h4 class="font-black text-slate-900 uppercase tracking-tight text-sm">Informasi
-                                        Utama</h4>
+                                    <h4 class="font-black text-slate-900 uppercase tracking-tight text-sm">Informasi Utama</h4>
                                 </div>
 
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                                     <div class="md:col-span-2">
-                                        <label
-                                            class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Nama
-                                            Event</label>
-                                        <input type="text" wire:model="name"
-                                            placeholder="Masukan nama lengkap event..."
+                                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Nama Event</label>
+                                        <input type="text" wire:model="name" placeholder="Masukan nama lengkap event..."
                                             class="w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-900 focus:ring-4 focus:ring-blue-50 outline-none transition">
-                                        @error('name')
-                                            <span
-                                                class="text-[10px] text-rose-500 font-bold ml-1 mt-1 block uppercase">{{ $message }}</span>
-                                        @enderror
+                                        @error('name') <span class="text-[10px] text-rose-500 font-bold ml-1 mt-1 block uppercase">{{ $message }}</span> @enderror
                                     </div>
 
                                     <div class="md:col-span-2">
-                                        <label
-                                            class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Lokasi</label>
+                                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Lokasi</label>
                                         <div class="relative">
-                                            <x-lucide-map-pin
-                                                class="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                                            <input type="text" wire:model="location"
-                                                placeholder="Lokasi kolam renang..."
+                                            <x-lucide-map-pin class="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                                            <input type="text" wire:model="location" placeholder="Lokasi kolam renang..."
                                                 class="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-900 focus:ring-4 focus:ring-blue-50 outline-none transition">
                                         </div>
                                     </div>
 
                                     <div class="md:col-span-2">
-                                        <label
-                                            class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Link
-                                            Group Koordinasi (WhatsApp/Telegram)</label>
+                                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Link Group Koordinasi (WhatsApp/Telegram)</label>
                                         <div class="relative">
-                                            <x-lucide-link
-                                                class="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                                            <input type="url" wire:model="group_link"
-                                                placeholder="https://chat.whatsapp.com/..."
+                                            <x-lucide-link class="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                                            <input type="url" wire:model="group_link" placeholder="https://chat.whatsapp.com/..."
                                                 class="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-900 focus:ring-4 focus:ring-blue-50 outline-none transition">
                                         </div>
-                                        @error('group_link')
-                                            <span
-                                                class="text-[10px] text-rose-500 font-bold ml-1 mt-1 block uppercase">{{ $message }}</span>
-                                        @enderror
+                                        @error('group_link') <span class="text-[10px] text-rose-500 font-bold ml-1 mt-1 block uppercase">{{ $message }}</span> @enderror
                                     </div>
 
                                     <div class="md:col-span-2">
-                                        <label
-                                            class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Jumlah
-                                            Lintasan</label>
+                                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Jumlah Lintasan</label>
                                         <input type="number" wire:model.live="lane_count"
                                             class="w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-900 focus:ring-4 focus:ring-blue-50 outline-none transition">
-                                        {{-- Section 2: Jadwal & Status --}}
-                                        <div class="bg-slate-50/50 rounded-3xl p-6 border border-slate-100">
-                                            <div class="flex items-center gap-3 mb-6">
-                                                <div
-                                                    class="w-8 h-8 bg-blue-100 rounded-xl flex items-center justify-center">
-                                                    <x-lucide-calendar class="w-4 h-4 text-blue-600" />
-                                                </div>
-                                                <h4 class="font-black text-slate-900 uppercase tracking-tight text-sm">
-                                                    Jadwal & Status</h4>
-                                            </div>
+                            {{-- Section 2: Jadwal & Status --}}
+                            <div class="bg-slate-50/50 rounded-3xl p-6 border border-slate-100">
+                                <div class="flex items-center gap-3 mb-6">
+                                    <div class="w-8 h-8 bg-blue-100 rounded-xl flex items-center justify-center">
+                                        <x-lucide-calendar class="w-4 h-4 text-blue-600" />
+                                    </div>
+                                    <h4 class="font-black text-slate-900 uppercase tracking-tight text-sm">Jadwal & Status</h4>
+                                </div>
 
-                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                                <div>
-                                                    <label
-                                                        class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Tanggal
-                                                        Mulai</label>
-                                                    <input type="date" wire:model="start_date"
-                                                        class="w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-900 focus:ring-4 focus:ring-blue-50 outline-none transition">
-                                                </div>
-                                                <div>
-                                                    <label
-                                                        class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Tanggal
-                                                        Selesai</label>
-                                                    <input type="date" wire:model="end_date"
-                                                        class="w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-900 focus:ring-4 focus:ring-blue-50 outline-none transition">
-                                                </div>
-                                                <div>
-                                                    <label
-                                                        class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Jam
-                                                        Mulai</label>
-                                                    <input type="time" wire:model="start_time"
-                                                        class="w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-900 focus:ring-4 focus:ring-blue-50 outline-none transition text-center">
-                                                </div>
-                                                <div>
-                                                    <label
-                                                        class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Status
-                                                        Publikasi</label>
-                                                    <div class="relative">
-                                                        <select wire:model="status"
-                                                            class="w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-900 focus:ring-4 focus:ring-blue-100 outline-none transition appearance-none uppercase tracking-widest">
-                                                            <option value="draft">Draft</option>
-                                                            <option value="upcoming">Upcoming</option>
-                                                            <option value="ongoing">Ongoing</option>
-                                                            <option value="completed">Completed</option>
-                                                            <option value="cancelled">Cancelled</option>
-                                                        </select>
-                                                        <x-lucide-chevron-down
-                                                            class="w-4 h-4 absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {{-- Section 3: Keuangan --}}
-                                        <div class="bg-slate-50/50 rounded-3xl p-6 border border-slate-100">
-                                            <div class="flex items-center gap-3 mb-6">
-                                                <div
-                                                    class="w-8 h-8 bg-amber-100 rounded-xl flex items-center justify-center">
-                                                    <x-lucide-landmark class="w-4 h-4 text-amber-600" />
-                                                </div>
-                                                <h4 class="font-black text-slate-900 uppercase tracking-tight text-sm">
-                                                    Informasi Pembayaran (Bank)</h4>
-                                            </div>
-
-                                            <div>
-                                                <label
-                                                    class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Rekening
-                                                    Tujuan Transfer</label>
-                                                <div class="relative">
-                                                    <select wire:model="payment_method_uid"
-                                                        class="w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-900 focus:ring-4 focus:ring-blue-100 outline-none transition appearance-none uppercase tracking-widest">
-                                                        <option value="">-- Tanpa Rekening (Gratis / Bayar Tunai)
-                                                            --</option>
-                                                        @foreach ($financeAccounts as $acc)
-                                                            <option value="{{ $acc->uid }}">{{ $acc->bank_name }}
-                                                                - {{ $acc->account_number }}
-                                                                ({{ $acc->account_name }})</option>
-                                                        @endforeach
-                                                    </select>
-                                                    <x-lucide-chevron-down
-                                                        class="w-4 h-4 absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none" />
-                                                </div>
-                                                @error('payment_method_uid')
-                                                    <span
-                                                        class="text-[10px] text-rose-500 font-bold ml-1 mt-1 block uppercase">{{ $message }}</span>
-                                                @enderror
-                                                <p
-                                                    class="text-[9px] text-slate-400 font-bold mt-2 ml-1 uppercase italic tracking-widest leading-relaxed">
-                                                    * Semua lomba dalam event ini akan dibayarkan ke satu pintu rekening
-                                                    di atas.</p>
-                                            </div>
-                                        </div>
-
-                                        {{-- Section 4: Media --}}
-                                        <div class="bg-slate-50/50 rounded-3xl p-6 border border-slate-100">
-                                            <div class="flex items-center gap-3 mb-6">
-                                                <div
-                                                    class="w-8 h-8 bg-purple-100 rounded-xl flex items-center justify-center">
-                                                    <x-lucide-image class="w-4 h-4 text-purple-600" />
-                                                </div>
-                                                <h4 class="font-black text-slate-900 uppercase tracking-tight text-sm">
-                                                    Media Event</h4>
-                                            </div>
-
-                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                                <div class="md:col-span-2">
-                                                    <label
-                                                        class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Logo
-                                                        Event (Kiri & Kanan)</label>
-                                                    <div class="grid grid-cols-2 gap-4">
-                                                        <div class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue">
-                                                            <div
-                                                                class="absolute inset-0 w-full h-full z-0 pointer-events-none">
-                                                                @if($existingLogoLeft)
-                                                                    <img src="{{ asset($existingLogoLeft) }}" class="w-full h-full object-cover">
-                                                                @endif
-                                                            </div>
-                                                            @if(!$existingLogoLeft)
-                                                            <div class="text-center relative z-10 pointer-events-none">
-                                                                <x-lucide-award
-                                                                    class="w-6 h-6 text-slate-300 group-hover:text-ksc-blue transition mb-2" />
-                                                                <span
-                                                                    class="text-[9px] font-black text-slate-400 uppercase tracking-widest group-hover:text-ksc-blue transition">Logo
-                                                                    Kiri</span>
-                                                            </div>
-                                                            @endif
-                                                            <input type="file" wire:model="logo_left" accept="image/*"
-                                                                class="absolute inset-0 opacity-0 cursor-pointer z-30">
-                                                        </div>
-                                                        <div class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue">
-                                                            <div
-                                                                class="absolute inset-0 w-full h-full z-0 pointer-events-none">
-                                                                @if($existingLogoRight)
-                                                                    <img src="{{ asset($existingLogoRight) }}" class="w-full h-full object-cover">
-                                                                @endif
-                                                            </div>
-                                                            @if(!$existingLogoRight)
-                                                            <div class="text-center relative z-10 pointer-events-none">
-                                                                <x-lucide-award
-                                                                    class="w-6 h-6 text-slate-300 group-hover:text-ksc-blue transition mb-2" />
-                                                                <span
-                                                                    class="text-[9px] font-black text-slate-400 uppercase tracking-widest group-hover:text-ksc-blue transition">Logo
-                                                                    Kanan</span>
-                                                            </div>
-                                                            @endif
-                                                            <input type="file" wire:model="logo_right" accept="image/*"
-                                                                class="absolute inset-0 opacity-0 cursor-pointer z-30">
-                                                        </div>
-                                                    </div>
-                                                    <div class="flex justify-between mt-1">
-                                                        @error('logo_left')
-                                                            <span
-                                                                class="text-[9px] text-rose-500 font-bold uppercase">{{ $message }}</span>
-                                                        @enderror
-                                                        @error('logo_right')
-                                                            <span
-                                                                class="text-[9px] text-rose-500 font-bold uppercase">{{ $message }}</span>
-                                                        @enderror
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <label
-                                                        class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Banner
-                                                        Event</label>
-                                                    <div class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue">
-                                                        <div
-                                                            class="absolute inset-0 w-full h-full z-0 pointer-events-none">
-                                                            @if($existingBanner)
-                                                                <img src="{{ asset($existingBanner) }}" class="w-full h-full object-cover">
-                                                            @endif
-                                                        </div>
-                                                        @if(!$existingBanner)
-                                                        <div class="text-center relative z-10 pointer-events-none">
-                                                            <x-lucide-image
-                                                                class="w-6 h-6 text-slate-300 group-hover:text-ksc-blue transition mb-2" />
-                                                            <span
-                                                                class="text-[9px] font-black text-slate-400 uppercase tracking-widest group-hover:text-ksc-blue transition">Unggah
-                                                                Banner</span>
-                                                        </div>
-                                                        @endif
-                                                        <input type="file" wire:model="banner" accept="image/*"
-                                                            class="absolute inset-0 opacity-0 cursor-pointer z-30">
-                                                    </div>
-                                                    @error('banner')
-                                                        <span
-                                                            class="text-[9px] text-rose-500 font-bold mt-1 uppercase">{{ $message }}</span>
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {{-- Section 4: Deskripsi --}}
-                                        <div class="bg-slate-50/50 rounded-3xl p-6 border border-slate-100">
-                                            <div class="flex items-center gap-3 mb-6">
-                                                <div
-                                                    class="w-8 h-8 bg-emerald-100 rounded-xl flex items-center justify-center">
-                                                    <x-lucide-file-text class="w-4 h-4 text-emerald-600" />
-                                                </div>
-                                                <h4 class="font-black text-slate-900 uppercase tracking-tight text-sm">
-                                                    Deskripsi & Rincian</h4>
-                                            </div>
-                                            <div wire:ignore x-data="{
-                                                init() {
-                                                    if (tinymce.get('tinymce-editor')) {
-                                                        tinymce.remove('#tinymce-editor');
-                                                    }
-
-                                                    // Watch for Livewire changes to update editor
-                                                    this.$watch('$wire.description', (value) => {
-                                                        const editor = tinymce.get('tinymce-editor');
-                                                        if (editor && value !== editor.getContent()) {
-                                                            editor.setContent(value || '');
-                                                        }
-                                                    });
-
-                                                    tinymce.init({
-                                                        selector: '#tinymce-editor',
-                                                        height: 350,
-                                                        license_key: 'gpl',
-                                                        menubar: false,
-                                                        statusbar: false,
-                                                        plugins: 'lists link help wordcount',
-                                                        toolbar: 'undo redo | blocks | bold italic | alignleft aligncenter alignright | bullist numlist | removeformat | help',
-                                                        content_style: 'body { font-family: \'Plus Jakarta Sans\', sans-serif; font-size: 14px; }',
-                                                        setup: (editor) => {
-                                                            editor.on('init', () => {
-                                                                editor.setContent($wire.get('description') || '');
-                                                            });
-                                                            editor.on('blur', () => {
-                                                                $wire.set('description', editor.getContent());
-                                                            });
-                                                        }
-                                                    });
-                                                }
-                                            }">
-                                                <textarea id="tinymce-editor" wire:model="description"
-                                                    class="w-full bg-white border border-slate-200 rounded-2xl shadow-sm outline-none p-4 min-h-48"></textarea>
-                                            </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                    <div>
+                                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Tanggal Mulai</label>
+                                        <input type="date" wire:model="start_date"
+                                            class="w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-900 focus:ring-4 focus:ring-blue-50 outline-none transition">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Tanggal Selesai</label>
+                                        <input type="date" wire:model="end_date"
+                                            class="w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-900 focus:ring-4 focus:ring-blue-50 outline-none transition">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Jam Mulai</label>
+                                        <input type="time" wire:model="start_time"
+                                            class="w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-900 focus:ring-4 focus:ring-blue-50 outline-none transition text-center">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Status Publikasi</label>
+                                        <div class="relative">
+                                            <select wire:model="status"
+                                                class="w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-900 focus:ring-4 focus:ring-blue-100 outline-none transition appearance-none uppercase tracking-widest">
+                                                <option value="draft">Draft</option>
+                                                <option value="upcoming">Upcoming</option>
+                                                <option value="ongoing">Ongoing</option>
+                                                <option value="completed">Completed</option>
+                                                <option value="cancelled">Cancelled</option>
+                                            </select>
+                                            <x-lucide-chevron-down class="w-4 h-4 absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none" />
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+
+                            {{-- Section 3: Keuangan --}}
+                            <div class="bg-slate-50/50 rounded-3xl p-6 border border-slate-100">
+                                <div class="flex items-center gap-3 mb-6">
+                                    <div class="w-8 h-8 bg-amber-100 rounded-xl flex items-center justify-center">
+                                        <x-lucide-landmark class="w-4 h-4 text-amber-600" />
+                                    </div>
+                                    <h4 class="font-black text-slate-900 uppercase tracking-tight text-sm">Informasi Pembayaran (Bank)</h4>
+                                </div>
+
+                                <div>
+                                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Rekening Tujuan Transfer</label>
+                                    <div class="relative">
+                                        <select wire:model="payment_method_uid"
+                                            class="w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-900 focus:ring-4 focus:ring-blue-100 outline-none transition appearance-none uppercase tracking-widest">
+                                            <option value="">-- Tanpa Rekening (Gratis / Bayar Tunai) --</option>
+                                            @foreach($financeAccounts as $acc)
+                                                <option value="{{ $acc->uid }}">{{ $acc->bank_name }} - {{ $acc->account_number }} ({{ $acc->account_name }})</option>
+                                            @endforeach
+                                        </select>
+                                        <x-lucide-chevron-down class="w-4 h-4 absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none" />
+                                    </div>
+                                    @error('payment_method_uid') <span class="text-[10px] text-rose-500 font-bold ml-1 mt-1 block uppercase">{{ $message }}</span> @enderror
+                                    <p class="text-[9px] text-slate-400 font-bold mt-2 ml-1 uppercase italic tracking-widest leading-relaxed">* Semua lomba dalam event ini akan dibayarkan ke satu pintu rekening di atas.</p>
+                                </div>
+                            </div>
+
+                            {{-- Section 4: Media --}}
+                            <div class="bg-slate-50/50 rounded-3xl p-6 border border-slate-100">
+                                <div class="flex items-center gap-3 mb-6">
+                                    <div class="w-8 h-8 bg-purple-100 rounded-xl flex items-center justify-center">
+                                        <x-lucide-image class="w-4 h-4 text-purple-600" />
+                                    </div>
+                                    <h4 class="font-black text-slate-900 uppercase tracking-tight text-sm">Media Event</h4>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                    <div class="md:col-span-2">
+                                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Logo Event (Kiri & Kanan)</label>
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <div wire:ignore class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue">
+                                                <div class="absolute inset-0 w-full h-full z-0 pointer-events-none">
+                                                    <img id="preview_me_logo_left" src="{{ $existingLogoLeft ? asset($existingLogoLeft) : '' }}" class="w-full h-full object-cover {{ $existingLogoLeft ? '' : 'hidden' }}">
+                                                </div>
+                                                <div id="placeholder_me_logo_left" class="text-center relative z-10 pointer-events-none {{ $existingLogoLeft ? 'hidden' : '' }}">
+                                                    <x-lucide-award class="w-6 h-6 text-slate-300 group-hover:text-ksc-blue transition mb-2" />
+                                                    <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest group-hover:text-ksc-blue transition">Logo Kiri</span>
+                                                </div>
+                                                <input type="file" id="me_logo_left" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer z-30" onchange="previewSingleImage(this, 'preview_me_logo_left', 'placeholder_me_logo_left')">
+                                            </div>
+                                            <div wire:ignore class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue">
+                                                <div class="absolute inset-0 w-full h-full z-0 pointer-events-none">
+                                                    <img id="preview_me_logo_right" src="{{ $existingLogoRight ? asset($existingLogoRight) : '' }}" class="w-full h-full object-cover {{ $existingLogoRight ? '' : 'hidden' }}">
+                                                </div>
+                                                <div id="placeholder_me_logo_right" class="text-center relative z-10 pointer-events-none {{ $existingLogoRight ? 'hidden' : '' }}">
+                                                    <x-lucide-award class="w-6 h-6 text-slate-300 group-hover:text-ksc-blue transition mb-2" />
+                                                    <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest group-hover:text-ksc-blue transition">Logo Kanan</span>
+                                                </div>
+                                                <input type="file" id="me_logo_right" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer z-30" onchange="previewSingleImage(this, 'preview_me_logo_right', 'placeholder_me_logo_right')">
+                                            </div>
+                                        </div>
+                                        <div class="flex justify-between mt-1">
+                                            @error('logo_left') <span class="text-[9px] text-rose-500 font-bold uppercase">{{ $message }}</span> @enderror
+                                            @error('logo_right') <span class="text-[9px] text-rose-500 font-bold uppercase">{{ $message }}</span> @enderror
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Banner Event</label>
+                                        <div wire:ignore class="relative group h-32 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden transition hover:border-ksc-blue">
+                                            <div class="absolute inset-0 w-full h-full z-0 pointer-events-none">
+                                                <img id="preview_me_banner" src="{{ $existingBanner ? asset($existingBanner) : '' }}" class="w-full h-full object-cover {{ $existingBanner ? '' : 'hidden' }}">
+                                            </div>
+                                            <div id="placeholder_me_banner" class="text-center relative z-10 pointer-events-none {{ $existingBanner ? 'hidden' : '' }}">
+                                                <x-lucide-image class="w-6 h-6 text-slate-300 group-hover:text-ksc-blue transition mb-2" />
+                                                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest group-hover:text-ksc-blue transition">Unggah Banner</span>
+                                            </div>
+                                            <input type="file" id="me_banner" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer z-30" onchange="previewSingleImage(this, 'preview_me_banner', 'placeholder_me_banner')">
+                                        </div>
+                                        @error('banner') <span class="text-[9px] text-rose-500 font-bold mt-1 uppercase">{{ $message }}</span> @enderror
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Section 4: Deskripsi --}}
+                            <div class="bg-slate-50/50 rounded-3xl p-6 border border-slate-100">
+                                <div class="flex items-center gap-3 mb-6">
+                                    <div class="w-8 h-8 bg-emerald-100 rounded-xl flex items-center justify-center">
+                                        <x-lucide-file-text class="w-4 h-4 text-emerald-600" />
+                                    </div>
+                                    <h4 class="font-black text-slate-900 uppercase tracking-tight text-sm">Deskripsi & Rincian</h4>
+                                </div>
+                                <div wire:ignore x-data="{
+                                        init() {
+                                            if (tinymce.get('tinymce-editor')) {
+                                                tinymce.remove('#tinymce-editor');
+                                            }
+
+                                            // Watch for Livewire changes to update editor
+                                            this.$watch('$wire.description', (value) => {
+                                                const editor = tinymce.get('tinymce-editor');
+                                                if (editor && value !== editor.getContent()) {
+                                                    editor.setContent(value || '');
+                                                }
+                                            });
+
+                                            tinymce.init({
+                                                selector: '#tinymce-editor',
+                                                height: 350,
+                                                license_key: 'gpl',
+                                                menubar: false,
+                                                statusbar: false,
+                                                plugins: 'lists link help wordcount',
+                                                toolbar: 'undo redo | blocks | bold italic | alignleft aligncenter alignright | bullist numlist | removeformat | help',
+                                                content_style: 'body { font-family: \'Plus Jakarta Sans\', sans-serif; font-size: 14px; }',
+                                                setup: (editor) => {
+                                                    editor.on('init', () => {
+                                                        editor.setContent($wire.get('description') || '');
+                                                    });
+                                                    editor.on('blur', () => {
+                                                        $wire.set('description', editor.getContent());
+                                                    });
+                                                }
+                                            });
+                                        }
+                                    }">
+                                    <textarea id="tinymce-editor" wire:model="description" class="w-full bg-white border border-slate-200 rounded-2xl shadow-sm outline-none p-4 min-h-48"></textarea>
+                                </div>
+                            </div>
+                        </div>
                     </form>
                 </div>
 
@@ -758,20 +631,51 @@ new class extends Component {
                         class="flex-1 px-8 py-4 bg-white border border-slate-200 text-slate-500 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-50 transition">
                         Batal
                     </button>
-                    <button type="submit" form="eventForm" wire:loading.attr="disabled"
-                                                        @click="
-                                                            const editor = tinymce.get('tinymce-editor');
-                                                            if(editor) { $wire.description = editor.getContent(); }
-                                                        "
-                                                        class="flex-1 px-8 py-4 bg-ksc-blue text-white rounded-2xl font-black shadow-xl shadow-blue-100 uppercase text-[10px] tracking-widest hover:bg-blue-700 transition flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed">
-                                                        <span wire:loading.remove wire:target="save, logo_left, logo_right, banner">
-                                                            {{ $modalMode === 'create' ? 'Simpan Event' : 'Perbarui Data' }}
-                                                        </span>
-                                                        <span wire:loading wire:target="save, logo_left, logo_right, banner" class="flex items-center gap-2">
-                                                            <x-lucide-loader-2 class="w-4 h-4 animate-spin" />
-                                                            <span>Memproses...</span>
-                                                        </span>
-                                                    </button>
+                    <button type="button" id="meSubmitBtn"
+                        @click="
+                            const editor = tinymce.get('tinymce-editor');
+                            if(editor) { $wire.description = editor.getContent(); }
+                            
+                            let promises = [];
+                            let ll = document.getElementById('me_logo_left')?.files[0];
+                            if (ll) promises.push(new Promise((resolve, reject) => { @this.upload('logo_left', ll, resolve, reject); }));
+                            
+                            let lr = document.getElementById('me_logo_right')?.files[0];
+                            if (lr) promises.push(new Promise((resolve, reject) => { @this.upload('logo_right', lr, resolve, reject); }));
+                            
+                            let bn = document.getElementById('me_banner')?.files[0];
+                            if (bn) promises.push(new Promise((resolve, reject) => { @this.upload('banner', bn, resolve, reject); }));
+                            
+                            const btn = document.getElementById('meSubmitBtn');
+                            const txtEl = document.getElementById('meSubmitText');
+                            const loadEl = document.getElementById('meSubmitLoading');
+                            
+                            if (promises.length > 0) {
+                                btn.disabled = true;
+                                txtEl.classList.add('hidden');
+                                loadEl.classList.remove('hidden');
+                                Promise.all(promises).then(() => {
+                                    $wire.save();
+                                    setTimeout(() => { btn.disabled = false; txtEl.classList.remove('hidden'); loadEl.classList.add('hidden'); }, 2000);
+                                }).catch(() => {
+                                    alert('Gagal mengunggah file. Silakan coba lagi.');
+                                    btn.disabled = false;
+                                    txtEl.classList.remove('hidden');
+                                    loadEl.classList.add('hidden');
+                                });
+                            } else {
+                                $wire.save();
+                            }
+                        "
+                        class="flex-1 px-8 py-4 bg-ksc-blue text-white rounded-2xl font-black shadow-xl shadow-blue-100 uppercase text-[10px] tracking-widest hover:bg-blue-700 transition flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed">
+                        <span id="meSubmitText">
+                            {{ $modalMode === 'create' ? 'Simpan Event' : 'Perbarui Data' }}
+                        </span>
+                        <span id="meSubmitLoading" class="hidden flex items-center gap-2">
+                            <x-lucide-loader-2 class="w-4 h-4 animate-spin" />
+                            <span>Memproses...</span>
+                        </span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -784,18 +688,13 @@ new class extends Component {
                 <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
             </div>
 
-            <div
-                class="bg-white rounded-[2.5rem] overflow-hidden shadow-2xl transform transition-all sm:w-full sm:max-w-md z-[2010] border border-slate-100">
+            <div class="bg-white rounded-[2.5rem] overflow-hidden shadow-2xl transform transition-all sm:w-full sm:max-w-md z-[2010] border border-slate-100">
                 <div class="p-12 text-center">
-                    <div
-                        class="w-20 h-20 bg-rose-50 rounded-[2.5rem] flex items-center justify-center mx-auto mb-8 shadow-xl shadow-rose-100">
+                    <div class="w-20 h-20 bg-rose-50 rounded-[2.5rem] flex items-center justify-center mx-auto mb-8 shadow-xl shadow-rose-100">
                         <x-lucide-trash-2 class="w-10 h-10 text-rose-600" />
                     </div>
                     <h3 class="text-2xl font-black text-slate-900 tracking-tighter uppercase mb-4">Hapus Event?</h3>
-                    <p
-                        class="text-slate-500 font-medium mb-10 px-10 leading-relaxed uppercase text-[10px] tracking-widest">
-                        Event <span class="text-rose-600 font-black">"{{ $eventToDelete?->name }}"</span> akan dihapus
-                        permanen dari sistem.</p>
+                    <p class="text-slate-500 font-medium mb-10 px-10 leading-relaxed uppercase text-[10px] tracking-widest">Event <span class="text-rose-600 font-black">"{{ $eventToDelete?->name }}"</span> akan dihapus permanen dari sistem.</p>
                     <div class="flex flex-col sm:flex-row gap-4 justify-center">
                         <button wire:click="$set('showDeleteModal', false)"
                             class="px-8 py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold hover:bg-slate-200 transition uppercase text-[10px] tracking-widest flex-1">Batal</button>
@@ -811,13 +710,13 @@ new class extends Component {
     @endif
 
     @script
-        <script>
-            // Cleanup on modal close or navigation
-            document.addEventListener('livewire:navigated', () => {
-                if (tinymce.get('tinymce-editor')) {
-                    tinymce.remove('#tinymce-editor');
-                }
-            });
-        </script>
+    <script>
+        // Cleanup on modal close or navigation
+        document.addEventListener('livewire:navigated', () => {
+            if (tinymce.get('tinymce-editor')) {
+                tinymce.remove('#tinymce-editor');
+            }
+        });
+    </script>
     @endscript
 </div>

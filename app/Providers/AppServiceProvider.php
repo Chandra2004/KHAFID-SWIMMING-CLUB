@@ -35,6 +35,8 @@ class AppServiceProvider extends ServiceProvider
         putenv('TMPDIR=' . $tmpDir);
         @ini_set('sys_temp_dir', $tmpDir);
         @ini_set('upload_tmp_dir', $tmpDir);
+        // -------------------------------------
+
         if (str_starts_with(config('app.url'), 'https://')) {
             \Illuminate\Support\Facades\URL::forceScheme('https');
         }

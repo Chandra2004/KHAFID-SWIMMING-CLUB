@@ -25,17 +25,17 @@ class ImageHelper
             }
         }
 
-        // Penentuan folder: Dokumen sensitif masuk ke storage/app (aman),
+        // Penentuan folder: Dokumen sensitif masuk ke storage/app (aman), 
         // Foto profil masuk ke public/uploads (akses cepat).
         $targetDir = 'uploads/' . $folder;
         $sensitiveFolders = ['ktp_documents', 'akta_documents', 'kk_documents'];
-
+        
         if (in_array($folder, $sensitiveFolders)) {
             $uploadPath = storage_path('app/' . $targetDir);
         } else {
             $uploadPath = public_path($targetDir);
         }
-
+        
         if (!file_exists($uploadPath)) {
             mkdir($uploadPath, 0777, true);
         }
@@ -46,11 +46,11 @@ class ImageHelper
 
         // Ambil info mime-type dengan peredam error (@)
         $imageInfo = @getimagesize($file->getRealPath());
-
+        
         if (!$imageInfo) {
             return null; // File bukan gambar yang valid
         }
-
+        
         $mime = $imageInfo['mime'];
 
         // Buat resource gambar berdasarkan tipe asli
@@ -67,7 +67,7 @@ class ImageHelper
         }
 
         if (!$image) return null;
-
+        
         // --- AUTO RESIZE LOGIC ---
         $maxWidth = 1920;
         $maxHeight = 1920;
@@ -87,11 +87,11 @@ class ImageHelper
             }
 
             $resizedImage = imagecreatetruecolor($newWidth, $newHeight);
-
+            
             // Pertahankan transparansi untuk hasil resize
             imagealphablending($resizedImage, false);
             imagesavealpha($resizedImage, true);
-
+            
             imagecopyresampled($resizedImage, $image, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
             imagedestroy($image);
             $image = $resizedImage;

@@ -10,8 +10,7 @@
     <title>{{ $title ?? 'Dashboard' }}</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     {{-- TinyMCE Editor --}}
     <script src="https://cdn.jsdelivr.net/npm/tinymce@7/tinymce.min.js" referrerpolicy="origin"></script>
@@ -23,9 +22,7 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['Plus Jakarta Sans', 'sans-serif']
-                    },
+                    fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] },
                     colors: {
                         ksc: {
                             blue: '#1e40af',
@@ -49,25 +46,20 @@
     </script>
 
     <style>
-        [x-cloak] {
-            display: none !important;
-        }
+        [x-cloak] { display: none !important; }
 
         /* Custom Scrollbar */
         .custom-scrollbar::-webkit-scrollbar {
             width: 5px;
             height: 5px;
         }
-
         .custom-scrollbar::-webkit-scrollbar-track {
             background: transparent;
         }
-
         .custom-scrollbar::-webkit-scrollbar-thumb {
             background: #e2e8f0;
             border-radius: 10px;
         }
-
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: #cbd5e1;
         }
@@ -95,15 +87,8 @@
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: none;
-            }
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: none; }
         }
     </style>
     @livewireStyles
@@ -122,8 +107,7 @@
                     <a href="/" class="flex justify-center w-full">
                         <img src="{{ asset('assets/ico/icon-bar.png') }}" class="h-20 w-auto" alt="Logo">
                     </a>
-                    <button id="closeSidebar"
-                        class="lg:hidden p-2 text-slate-400 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-all">
+                    <button id="closeSidebar" class="lg:hidden p-2 text-slate-400 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-all">
                         <x-lucide-x class="w-6 h-6" />
                     </button>
                 </div>
@@ -137,8 +121,7 @@
                 <div class="pt-8 mt-8 border-t border-slate-100">
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
-                        <button type="submit"
-                            class="flex items-center w-full gap-3 px-5 py-4 text-rose-500 hover:bg-rose-50 rounded-2xl transition-all group font-black uppercase text-[11px] tracking-widest">
+                        <button type="submit" class="flex items-center w-full gap-3 px-5 py-4 text-rose-500 hover:bg-rose-50 rounded-2xl transition-all group font-black uppercase text-[11px] tracking-widest">
                             <x-lucide-log-out class="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
                             <span>Keluar Sistem</span>
                         </button>
@@ -151,11 +134,9 @@
         <div class="flex-1 flex flex-col min-w-0 h-screen relative overflow-hidden">
 
             <!-- HEADER -->
-            <header
-                class="h-20 flex-shrink-0 glass-effect border-b border-slate-200/60 flex items-center justify-between px-4 md:px-10 sticky top-0 z-[30]">
+            <header class="h-20 flex-shrink-0 glass-effect border-b border-slate-200/60 flex items-center justify-between px-4 md:px-10 sticky top-0 z-[30]">
                 <div class="flex items-center gap-3 md:gap-6">
-                    <button id="toggleSidebar"
-                        class="lg:hidden p-3 bg-white hover:bg-slate-50 text-slate-900 rounded-xl transition-all shadow-sm border border-slate-100">
+                    <button id="toggleSidebar" class="lg:hidden p-3 bg-white hover:bg-slate-50 text-slate-900 rounded-xl transition-all shadow-sm border border-slate-100">
                         <x-lucide-menu class="w-6 h-6" />
                     </button>
                     <div class="hidden sm:block">
@@ -178,8 +159,7 @@
                             class="h-12 w-12 bg-white rounded-2xl flex items-center justify-center text-slate-500 hover:text-blue-600 hover:shadow-xl hover:shadow-blue-500/10 transition-all relative border border-slate-100 group">
                             <x-lucide-bell class="w-5 h-5 group-hover:rotate-12 transition" />
                             @if ($totalUnreadNotifications > 0)
-                                <span
-                                    class="absolute top-2.5 right-2.5 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white shadow-sm"></span>
+                                <span class="absolute top-2.5 right-2.5 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white shadow-sm"></span>
                             @endif
                         </button>
 
@@ -190,54 +170,40 @@
                             x-transition:enter-end="opacity-100 translate-y-0 scale-100"
                             class="absolute top-full right-0 mt-4 w-80 md:w-96 bg-white rounded-3xl shadow-2xl border border-slate-100 z-50 overflow-hidden ring-1 ring-slate-900/5">
 
-                            <div
-                                class="px-6 py-5 border-b border-slate-50 bg-slate-50/30 flex justify-between items-center">
+                            <div class="px-6 py-5 border-b border-slate-50 bg-slate-50/30 flex justify-between items-center">
                                 <div>
-                                    <h3 class="font-black text-slate-900 text-xs uppercase tracking-widest">
-                                        Pemberitahuan</h3>
-                                    <p class="text-[9px] text-slate-400 font-bold uppercase mt-0.5">Informasi Aktivitas
-                                        Terbaru</p>
+                                    <h3 class="font-black text-slate-900 text-xs uppercase tracking-widest">Pemberitahuan</h3>
+                                    <p class="text-[9px] text-slate-400 font-bold uppercase mt-0.5">Informasi Aktivitas Terbaru</p>
                                 </div>
-                                <span
-                                    class="px-2.5 py-1 bg-blue-50 text-blue-600 rounded-lg text-[10px] font-black">{{ $totalUnreadNotifications }}
-                                    Baru</span>
+                                <span class="px-2.5 py-1 bg-blue-50 text-blue-600 rounded-lg text-[10px] font-black">{{ $totalUnreadNotifications }} Baru</span>
                             </div>
 
                             <div class="max-h-[450px] overflow-y-auto custom-scrollbar">
                                 @forelse($unreadNotifications as $notification)
-                                    <div
-                                        class="group flex items-start gap-4 p-5 hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0">
-                                        <div
-                                            class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex-shrink-0 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all duration-500 shadow-sm shadow-blue-100">
+                                    <div class="group flex items-start gap-4 p-5 hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0">
+                                        <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex-shrink-0 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all duration-500 shadow-sm shadow-blue-100">
                                             <x-lucide-bell-ring class="w-5 h-5" />
                                         </div>
                                         <div class="flex-grow">
-                                            <p class="text-sm text-slate-900 font-black leading-tight mb-1">
-                                                {{ $notification->title }}</p>
+                                            <p class="text-sm text-slate-900 font-black leading-tight mb-1">{{ $notification->title }}</p>
                                             <div class="text-[11px] text-slate-500 leading-relaxed line-clamp-2">
                                                 {!! $notification->message !!}
                                             </div>
-                                            <p
-                                                class="text-[9px] text-slate-300 font-bold uppercase mt-2 tracking-widest">
-                                                {{ $notification->created_at->diffForHumans() }}</p>
+                                            <p class="text-[9px] text-slate-300 font-bold uppercase mt-2 tracking-widest">{{ $notification->created_at->diffForHumans() }}</p>
                                         </div>
                                     </div>
                                 @empty
                                     <div class="py-20 px-8 text-center bg-slate-50/20">
-                                        <div
-                                            class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm border border-slate-100">
+                                        <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm border border-slate-100">
                                             <x-lucide-bell-off class="w-8 h-8 text-slate-200" />
                                         </div>
-                                        <h4 class="text-sm font-black text-slate-400 uppercase tracking-widest">Semua
-                                            Sunyi</h4>
-                                        <p class="text-[10px] text-slate-300 font-bold mt-1">Belum ada pemberitahuan
-                                            baru untuk Anda</p>
+                                        <h4 class="text-sm font-black text-slate-400 uppercase tracking-widest">Semua Sunyi</h4>
+                                        <p class="text-[10px] text-slate-300 font-bold mt-1">Belum ada pemberitahuan baru untuk Anda</p>
                                     </div>
                                 @endforelse
                             </div>
 
-                            <a href="{{ url('/dashboard/notifications') }}"
-                                class="block py-4 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest hover:bg-slate-50 hover:text-slate-900 transition border-t border-slate-50">
+                            <a href="{{ url('/dashboard/notifications') }}" class="block py-4 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest hover:bg-slate-50 hover:text-slate-900 transition border-t border-slate-50">
                                 Lihat Semua Aktivitas
                             </a>
                         </div>
@@ -245,22 +211,17 @@
 
                     <!-- USER PROFILE DROPDOWN -->
                     <div x-data="{ open: false }" class="relative">
-                        <div @click="open = !open"
-                            class="flex items-center gap-3 pl-3 md:pl-6 border-l border-slate-200 cursor-pointer group">
+                        <div @click="open = !open" class="flex items-center gap-3 pl-3 md:pl-6 border-l border-slate-200 cursor-pointer group">
                             <div class="text-right hidden md:block">
-                                <p
-                                    class="text-sm font-black text-slate-900 group-hover:text-blue-600 transition tracking-tighter">
-                                    {{ $user->username }}</p>
+                                <p class="text-sm font-black text-slate-900 group-hover:text-blue-600 transition tracking-tighter">{{ $user->username }}</p>
                                 <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">
                                     {{ $user->getRoleNames()->first() }}
                                 </p>
                             </div>
                             <div class="relative">
                                 <img src="https://ui-avatars.com/api/?name={{ urlencode($user->username) }}&background=1e293b&color=fff&bold=true"
-                                    class="h-11 w-11 rounded-2xl border-2 border-transparent group-hover:border-blue-600 transition-all shadow-lg shadow-slate-200"
-                                    alt="Avatar">
-                                <span
-                                    class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-white"></span>
+                                    class="h-11 w-11 rounded-2xl border-2 border-transparent group-hover:border-blue-600 transition-all shadow-lg shadow-slate-200" alt="Avatar">
+                                <span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-white"></span>
                             </div>
                         </div>
 
@@ -272,10 +233,8 @@
                             class="absolute top-full right-0 mt-4 w-64 bg-white rounded-3xl shadow-2xl border border-slate-100 z-50 overflow-hidden ring-1 ring-slate-900/5">
 
                             <div class="px-6 py-6 border-b border-slate-50 bg-slate-50/30">
-                                <p class="text-xs font-black text-slate-900 uppercase tracking-widest truncate">
-                                    {{ $user->nama_lengkap }}</p>
-                                <p class="text-[10px] text-slate-400 font-bold mt-1 uppercase tracking-tighter">
-                                    {{ $user->email }}</p>
+                                <p class="text-xs font-black text-slate-900 uppercase tracking-widest truncate">{{ $user->nama_lengkap }}</p>
+                                <p class="text-[10px] text-slate-400 font-bold mt-1 uppercase tracking-tighter">{{ $user->email }}</p>
                             </div>
 
                             <div class="p-2">
@@ -297,8 +256,7 @@
                             <div class="p-2">
                                 <form action="{{ route('logout') }}" method="POST">
                                     @csrf
-                                    <button type="submit"
-                                        class="flex items-center w-full gap-3 px-4 py-3.5 text-[11px] font-black uppercase tracking-widest text-rose-500 hover:bg-rose-50 rounded-2xl transition-all">
+                                    <button type="submit" class="flex items-center w-full gap-3 px-4 py-3.5 text-[11px] font-black uppercase tracking-widest text-rose-500 hover:bg-rose-50 rounded-2xl transition-all">
                                         <x-lucide-power class="w-4 h-4" />
                                         <span>Keluar Sesi</span>
                                     </button>
@@ -363,8 +321,8 @@
         });
     </script>
 
+    <script src="{{ asset('js/previewImage.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
     @livewireScripts
 </body>
-
 </html>
