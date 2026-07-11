@@ -17,7 +17,6 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->web(append: [
             \App\Http\Middleware\ShareNotifications::class,
-            \App\Http\Middleware\NgrokBypass::class,
         ]);
 
         $middleware->alias([
