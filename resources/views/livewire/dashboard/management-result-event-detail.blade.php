@@ -25,6 +25,9 @@ new class extends Component {
     // Form fields
     public $form_status = 'FINISH'; 
     public $form_final_time = '';
+    public $time_minutes = '';
+    public $time_seconds = '';
+    public $time_milliseconds = '';
     public $form_notes = '';
 
     public function mount($event_uid)
@@ -120,8 +123,34 @@ new class extends Component {
         if ($reg->result) {
             $this->form_final_time = $reg->result->final_time;
             $this->form_status = $reg->result->status ?: 'FINISH';
+            
+            if ($this->form_final_time) {
+                $parts = explode(':', $this->form_final_time);
+                if (count($parts) === 2) {
+                    $this->time_minutes = $parts[0];
+                    $secParts = explode('.', $parts[1]);
+                    if (count($secParts) === 2) {
+                        $this->time_seconds = $secParts[0];
+                        $this->time_milliseconds = $secParts[1];
+                    } else {
+                        $this->time_seconds = $parts[1];
+                        $this->time_milliseconds = '00';
+                    }
+                } else {
+                    $this->time_minutes = '00';
+                    $this->time_seconds = '00';
+                    $this->time_milliseconds = '00';
+                }
+            } else {
+                $this->time_minutes = '';
+                $this->time_seconds = '';
+                $this->time_milliseconds = '';
+            }
         } else {
             $this->form_final_time = '';
+            $this->time_minutes = '';
+            $this->time_seconds = '';
+            $this->time_milliseconds = '';
             $this->form_status = 'FINISH';
         }
 
@@ -132,12 +161,28 @@ new class extends Component {
     {
         $this->authorize('master-result.detail.edit');
 
-        $this->validate([
-            'form_status' => 'required|in:FINISH,DNS,DQ',
-            'form_final_time' => $this->form_status === 'FINISH' ? 'required|regex:/^[0-9]{2}:[0-9]{2}\.[0-9]{2}$/' : 'nullable',
-        ], [
-            'form_final_time.regex' => 'Format MM:SS.ss (contoh: 01:23.45)',
-        ]);
+        if ($this->form_status === 'FINISH') {
+            $this->validate([
+                'time_minutes' => 'required|integer|min:0|max:99',
+                'time_seconds' => 'required|integer|min:0|max:59',
+                'time_milliseconds' => 'required|integer|min:0|max:99',
+            ], [
+                'time_minutes.required' => 'Menit wajib diisi',
+                'time_minutes.integer' => 'Menit harus berupa angka',
+                'time_seconds.required' => 'Detik wajib diisi',
+                'time_seconds.integer' => 'Detik harus berupa angka',
+                'time_seconds.max' => 'Detik maksimal 59',
+                'time_milliseconds.required' => 'Milidetik wajib diisi',
+                'time_milliseconds.integer' => 'Milidetik harus berupa angka',
+            ]);
+
+            $mins = str_pad((int)$this->time_minutes, 2, '0', STR_PAD_LEFT);
+            $secs = str_pad((int)$this->time_seconds, 2, '0', STR_PAD_LEFT);
+            $milis = str_pad((int)$this->time_milliseconds, 2, '0', STR_PAD_LEFT);
+            $this->form_final_time = "{$mins}:{$secs}.{$milis}";
+        } else {
+            $this->form_final_time = null;
+        }
 
         $reg = Registration::withTrashed()->where('uid', $this->editingUid)->firstOrFail();
         $totalMs = ($this->form_status === 'FINISH' && $this->form_final_time) ? $this->calculateMilliseconds($this->form_final_time) : null;
@@ -408,9 +453,28 @@ new class extends Component {
                         </div>
                         @if($form_status === 'FINISH')
                             <div>
-                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Waktu Kecepatan (MM:SS.ss)</label>
-                                <input type="text" wire:model="form_final_time" placeholder="01:23.45" class="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-xl font-black text-blue-600 focus:ring-4 focus:ring-slate-100 outline-none transition placeholder:text-slate-200">
-                                @error('form_final_time') <p class="text-rose-500 text-[10px] font-bold uppercase tracking-widest mt-2">{{ $message }}</p> @enderror
+                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Waktu Kecepatan</label>
+                                <div class="grid grid-cols-3 gap-3 items-center">
+                                    <div class="relative">
+                                        <input type="number" min="0" max="99" placeholder="00" wire:model="time_minutes" class="w-full px-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-center text-xl font-black text-blue-600 focus:ring-4 focus:ring-slate-100 outline-none transition">
+                                        <span class="absolute right-3 top-1/2 -translate-y-1/2 font-black text-slate-400">:</span>
+                                        <span class="block text-[9px] text-center text-slate-400 uppercase font-bold mt-1">Menit</span>
+                                    </div>
+                                    <div class="relative">
+                                        <input type="number" min="0" max="59" placeholder="00" wire:model="time_seconds" class="w-full px-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-center text-xl font-black text-blue-600 focus:ring-4 focus:ring-slate-100 outline-none transition">
+                                        <span class="absolute right-3 top-1/2 -translate-y-1/2 font-black text-slate-400">.</span>
+                                        <span class="block text-[9px] text-center text-slate-400 uppercase font-bold mt-1">Detik</span>
+                                    </div>
+                                    <div>
+                                        <input type="number" min="0" max="99" placeholder="00" wire:model="time_milliseconds" class="w-full px-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-center text-xl font-black text-blue-600 focus:ring-4 focus:ring-slate-100 outline-none transition">
+                                        <span class="block text-[9px] text-center text-slate-400 uppercase font-bold mt-1">Mili</span>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-3 gap-3 mt-1 px-1">
+                                    <div>@error('time_minutes') <p class="text-rose-500 text-[9px] font-bold uppercase tracking-widest">{{ $message }}</p> @enderror</div>
+                                    <div>@error('time_seconds') <p class="text-rose-500 text-[9px] font-bold uppercase tracking-widest">{{ $message }}</p> @enderror</div>
+                                    <div>@error('time_milliseconds') <p class="text-rose-500 text-[9px] font-bold uppercase tracking-widest">{{ $message }}</p> @enderror</div>
+                                </div>
                             </div>
                         @endif
                         <div class="pt-6 border-t border-slate-50 flex justify-end gap-4">
