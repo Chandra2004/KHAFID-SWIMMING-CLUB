@@ -10,7 +10,38 @@ use App\Helpers\ImageHelper;
 
 new class extends Component {
     use WithPagination;
-    use WithFileUploads;
+    use WithFileUploads {
+        _startUpload as traitStartUpload;
+        _finishUpload as traitFinishUpload;
+        _uploadErrored as traitUploadErrored;
+    }
+
+    public function _startUpload($name, $fileInfo, $isMultiple)
+    {
+        if (str_ends_with($name, '[]')) {
+            $name = substr($name, 0, -2);
+            $isMultiple = true;
+        }
+        $this->traitStartUpload($name, $fileInfo, $isMultiple);
+    }
+
+    public function _finishUpload($name, $tmpPath, $isMultiple, $append = true)
+    {
+        if (str_ends_with($name, '[]')) {
+            $name = substr($name, 0, -2);
+            $isMultiple = true;
+        }
+        $this->traitFinishUpload($name, $tmpPath, $isMultiple, $append);
+    }
+
+    public function _uploadErrored($name, $errorsInJson, $isMultiple)
+    {
+        if (str_ends_with($name, '[]')) {
+            $name = substr($name, 0, -2);
+            $isMultiple = true;
+        }
+        $this->traitUploadErrored($name, $errorsInJson, $isMultiple);
+    }
 
     public $search = '';
 
@@ -436,7 +467,7 @@ new class extends Component {
                         const photosInput = document.getElementById('mg_photos');
                         if (photosInput && photosInput.files.length > 0) {
                             promises.push(new Promise((resolve, reject) => { 
-                                @this.upload('photos', photosInput.files, resolve, reject); 
+                                @this.uploadMultiple('photos', photosInput.files, resolve, reject); 
                             }));
                         }
                         
