@@ -436,7 +436,7 @@ new class extends Component {
                         const photosInput = document.getElementById('mg_photos');
                         if (photosInput && photosInput.files.length > 0) {
                             promises.push(new Promise((resolve, reject) => { 
-                                @this.uploadMultiple('photos', photosInput.files, resolve, reject); 
+                                @this.upload('photos', photosInput.files, resolve, reject); 
                             }));
                         }
                         
