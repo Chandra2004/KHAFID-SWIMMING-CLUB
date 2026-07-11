@@ -2067,12 +2067,20 @@ new class extends Component {
     $wire.on('open-invoice-url', (event) => {
         const url = event.url || (Array.isArray(event) ? event[0].url : null);
         if (url) {
-            const a = document.createElement('a');
-            a.href = url;
-            a.target = '_blank';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+            // 1. Buka tab baru untuk review / print manual
+            const aTab = document.createElement('a');
+            aTab.href = url;
+            aTab.target = '_blank';
+            document.body.appendChild(aTab);
+            aTab.click();
+            document.body.removeChild(aTab);
+
+            // 2. Download otomatis langsung ke komputer
+            const aDownload = document.createElement('a');
+            aDownload.href = url + (url.includes('?') ? '&' : '?') + 'download=1';
+            document.body.appendChild(aDownload);
+            aDownload.click();
+            document.body.removeChild(aDownload);
         }
     });
 
