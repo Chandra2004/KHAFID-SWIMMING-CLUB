@@ -435,10 +435,9 @@ new class extends Component {
                         // Upload multiple photos jika ada
                         const photosInput = document.getElementById('mg_photos');
                         if (photosInput && photosInput.files.length > 0) {
-                            const filesArr = Array.from(photosInput.files);
-                            filesArr.forEach(file => {
-                                promises.push(new Promise((resolve, reject) => { @this.upload('photos[]', file, resolve, reject); }));
-                            });
+                            promises.push(new Promise((resolve, reject) => { 
+                                @this.uploadMultiple('photos', photosInput.files, resolve, reject); 
+                            }));
                         }
                         
                         const btn = document.getElementById('mgSubmitBtn');

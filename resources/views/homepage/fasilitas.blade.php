@@ -20,12 +20,12 @@
 <!-- Facilitiy Showcase -->
 <section class="py-24">
     <div class="container mx-auto px-6 space-y-24">
-        
+
         <!-- Olympic Pool -->
         <div class="flex flex-col lg:flex-row items-center gap-16 reveal">
             <div class="w-full lg:w-1/2">
                 <div class="relative rounded-[2.5rem] overflow-hidden shadow-2xl">
-                    <img src="{{ url('/images/gambar_renang_25.webp') }}" class="w-full h-full object-cover transform hover:scale-105 transition duration-700">
+                    <img src="{{ url('images/gambar_renang_26.webp') }}" class="w-full h-full object-cover transform hover:scale-105 transition duration-700">
                 </div>
             </div>
             <div class="w-full lg:w-1/2">
@@ -103,4 +103,4 @@
 
 @endsection
 
-    
+

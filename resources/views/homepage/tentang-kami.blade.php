@@ -54,7 +54,7 @@
                 <div class="lg:w-1/2">
 
                     <h2 class="text-4xl md:text-5xl font-extrabold text-slate-900 mb-8 leading-tight">
-                        Perjalanan 
+                        Perjalanan
                         <br><span class="text-ksc-blue">Khafid Swimming Club</span>
                     </h2>
 
@@ -319,7 +319,7 @@
                         <div class="swiper-slide group">
                             <div class="relative mb-6">
                                 <div class="aspect-[4/5] rounded-[32px] overflow-hidden shadow-lg border border-slate-100">
-                                    <img src="{{ url('/file/users/' . $mentor['foto_profil']) }}"
+                                    <img src="{{ asset($mentor['foto_profil']) }}"
                                         class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition duration-700 group-hover:scale-110">
                                 </div>
                                 <div

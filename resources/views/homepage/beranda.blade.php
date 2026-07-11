@@ -96,7 +96,7 @@
                 @foreach ($events as $event)
                     <div class="rounded-3xl overflow-hidden relative shadow-2xl cursor-pointer group h-[400px] md:h-[500px]"
                         onclick="openModal('modal-featured')">
-                        <img src=" {{ url('/file/banner-event/' . $event['banner_event']) }}"
+                        <img src=" {{ asset($event['banner_event']) }}"
                             class="w-full h-full object-cover transition duration-700 group-hover:scale-105 brightness-[0.6]">
                         <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent"></div>
 
@@ -173,7 +173,7 @@
                 {{-- ini di looping --}}
                 @foreach ($galleries as $gallery)
                     <div class="break-inside-avoid relative group rounded-xl overflow-hidden cursor-pointer">
-                        <img src="{{ url('/file/galleries/' . $gallery['foto_event']) }}"
+                        <img src="{{ asset($gallery['foto_event']) }}"
                             class="w-full h-auto object-cover transform transition duration-500 group-hover:scale-110">
                         <div
                             class="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition duration-300 flex items-end p-6">

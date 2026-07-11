@@ -182,7 +182,8 @@ class HomepageController extends Controller
             'galleries' => $pagination->getCollection()->map(function($g) {
                 return [
                     'foto_event' => $g->cover_image,
-                    'nama_event' => $g->title
+                    'nama_event' => $g->title,
+                    'foto_lainnya' => $g->images ?: []
                 ];
             })->toArray(),
             'pagination' => $pagination->toArray(),
