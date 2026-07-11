@@ -143,7 +143,7 @@
                                 <span class="flex items-center gap-2"><x-lucide-map-pin
                                         class="w-4 h-4 text-ksc-accent" /> {{ $event['lokasi_event'] }}</span>
                             </div>
-                            <a href="{{ url('/detail-event/') . $event['slug'] . '/' . $event['uid'] }}"
+                            <a href="{{ url('/detail-event') . '/' . $event['slug'] . '/' . $event['uid'] }}"
                                 class="bg-white text-slate-900 font-bold py-2.5 px-6 rounded-full hover:bg-ksc-accent hover:text-white transition shadow-lg inline-flex items-center gap-2 text-sm">
                                 Lihat Detail <x-lucide-arrow-up-right class="w-4 h-4" />
                             </a>
