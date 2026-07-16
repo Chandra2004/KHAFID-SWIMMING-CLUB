@@ -805,7 +805,7 @@ new class extends Component {
                 Persetujuan Peserta Lomba</p>
         </div>
 
-        @if(auth()->user()->can('master-pendaftaran.create') || auth()->user()->can('master-pendaftaran.create.self'))
+        @if(auth()->user()->can('master-pendaftaran.create') || (auth()->user()->can('master-pendaftaran.create.self') && auth()->user()->isProfileComplete()))
             <button wire:click="openCreateModal"
                 class="flex items-center gap-3 bg-ksc-blue hover:bg-blue-700 text-white px-8 py-4 rounded-2xl font-black transition shadow-xl shadow-blue-100 transform hover:-translate-y-1 uppercase text-xs tracking-widest group relative overflow-hidden">
                 <div
@@ -816,6 +816,17 @@ new class extends Component {
                     {{ auth()->user()->can('master-pendaftaran.create') ? 'Pendaftaran Manual' : 'Daftar Event Sekarang' }}
                 </span>
             </button>
+        @elseif(auth()->user()->can('master-pendaftaran.create.self') && !auth()->user()->isProfileComplete())
+            <div class="flex flex-col items-end gap-2">
+                <a href="{{ route('dashboard.my-profile') }}"
+                    class="flex items-center gap-3 bg-rose-600 hover:bg-rose-700 text-white px-8 py-4 rounded-2xl font-black transition shadow-xl shadow-rose-100 transform hover:-translate-y-1 uppercase text-xs tracking-widest group">
+                    <x-lucide-user-cog class="w-5 h-5 text-white" />
+                    <span>Lengkapi Profil</span>
+                </a>
+                <span class="text-[10px] font-bold text-rose-500 uppercase tracking-widest italic text-right">
+                    *Pendaftaran dikunci, lengkapi profil terlebih dahulu!
+                </span>
+            </div>
         @endif
     </div>
 
@@ -2009,7 +2020,7 @@ new class extends Component {
                             }
                         "
                         class="px-8 py-3.5 bg-ksc-blue text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-blue-100 hover:bg-blue-700 transition transform hover:-translate-y-1 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2">
-                        <span id="mpSaveText">Simpan Pendaftaran</span>
+                        <span id="mpSaveText">Daftar Sekarang</span>
                         <span id="mpSaveLoading" class="hidden flex items-center gap-2">
                             <x-lucide-loader-2 class="w-4 h-4 animate-spin" />
                             Menyimpan...

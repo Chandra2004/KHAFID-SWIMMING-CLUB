@@ -145,11 +145,23 @@
                                         @endif
 
                                         @can('master-pendaftaran.create.self')
-                                            <button
-                                                wire:click="closeCreateModal"
-                                                class="w-full py-5 bg-ksc-blue hover:bg-ksc-dark text-white rounded-2xl font-black shadow-xl shadow-blue-200 transition transform hover:-translate-y-1 flex items-center justify-center gap-3 uppercase tracking-tighter italic">
-                                                {{ $regCount > 0 ? 'DAFTAR LAGI / TAMBAH LOMBA' : 'DAFTAR SEKARANG' }} <x-lucide-arrow-right class="w-5 h-5" />
-                                            </button>
+                                            @if($user->isProfileComplete())
+                                                <button
+                                                    wire:click="closeCreateModal"
+                                                    class="w-full py-5 bg-ksc-blue hover:bg-ksc-dark text-white rounded-2xl font-black shadow-xl shadow-blue-200 transition transform hover:-translate-y-1 flex items-center justify-center gap-3 uppercase tracking-tighter italic">
+                                                    {{ $regCount > 0 ? 'DAFTAR LAGI / TAMBAH LOMBA' : 'DAFTAR SEKARANG' }} <x-lucide-arrow-right class="w-5 h-5" />
+                                                </button>
+                                            @else
+                                                <div class="space-y-3">
+                                                    <a href="{{ route('dashboard.my-profile') }}"
+                                                        class="w-full py-5 bg-rose-600 hover:bg-rose-700 text-white rounded-2xl font-black shadow-xl shadow-rose-200 transition transform hover:-translate-y-1 flex items-center justify-center gap-3 text-center uppercase tracking-tighter italic">
+                                                        LENGKAPI DATA PROFIL DULU <x-lucide-user-cog class="w-5 h-5" />
+                                                    </a>
+                                                    <p class="text-[10px] text-center text-rose-500 font-bold uppercase tracking-wide leading-relaxed">
+                                                        *Fitur pendaftaran dikunci karena profil Anda belum lengkap. Silakan klik tombol di atas untuk melengkapi profil Anda.
+                                                    </p>
+                                                </div>
+                                            @endif
                                         @else
                                             <div class="w-full py-5 bg-amber-50 text-amber-700 rounded-2xl font-bold flex items-center justify-center gap-2 border border-amber-100 text-xs text-center px-4">
                                                 <x-lucide-lock class="w-4 h-4" /> AKUN ANDA TIDAK MEMILIKI AKSES PENDAFTARAN
@@ -726,7 +738,7 @@
                         wire:loading.attr="disabled"
                         wire:target="saveManualRegistration, create_payment_proof"
                         class="px-8 py-3.5 bg-ksc-blue text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-blue-100 hover:bg-blue-700 transition transform hover:-translate-y-1 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2">
-                        <span wire:loading.remove wire:target="saveManualRegistration, create_payment_proof">Simpan Pendaftaran</span>
+                        <span wire:loading.remove wire:target="saveManualRegistration, create_payment_proof">Daftar Sekarang</span>
                         <span wire:loading wire:target="saveManualRegistration, create_payment_proof" class="flex items-center gap-2">
                             <x-lucide-loader-2 class="w-4 h-4 animate-spin" />
                             Memproses...

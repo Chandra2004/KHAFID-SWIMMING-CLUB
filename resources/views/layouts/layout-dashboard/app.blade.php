@@ -143,7 +143,7 @@
                         <div class="flex items-center gap-2 mb-0.5">
                             <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
                             <h1 class="text-sm md:text-base font-black text-slate-900 tracking-tight uppercase">
-                                Monitoring <span class="text-blue-600">Center</span>
+                                Hai <span class="text-blue-600">{{ Auth::user()->username }}</span>
                             </h1>
                         </div>
                         <p class="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em] leading-none">
