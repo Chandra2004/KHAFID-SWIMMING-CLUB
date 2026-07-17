@@ -2,12 +2,12 @@
 
 @section('dashboard-section')
     <div class="px-4 md:px-10 py-10 space-y-10 pb-20">
-        
+
         <!-- HEADER SECTION: Clean & Modern -->
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
                 <h1 class="text-2xl md:text-3xl font-black text-slate-900 tracking-tight uppercase">
-                    Control <span class="text-blue-600">Panel</span>
+                    Dashboard <span class="text-blue-600">{{ $user->getRoleNames()->first() }}</span>
                 </h1>
                 <p class="text-xs md:text-sm text-slate-500 font-bold uppercase tracking-widest mt-1">
                     System Overview <span class="text-slate-300 mx-2">|</span> {{ Auth::user()->username }}
