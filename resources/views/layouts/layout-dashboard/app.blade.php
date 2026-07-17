@@ -147,7 +147,7 @@
                             </h1>
                         </div>
                         <p class="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em] leading-none">
-                            Swimming Club Management System
+                            KSC MANAGEMENT SYSTEM
                         </p>
                     </div>
                 </div>
