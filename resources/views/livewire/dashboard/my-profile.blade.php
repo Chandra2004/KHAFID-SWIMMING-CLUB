@@ -503,7 +503,7 @@ new class extends Component {
                         </div>
                         <div>
                             <label class="block mb-2 text-[11px] font-black text-slate-400 uppercase tracking-widest">Tempat Lahir <span class="text-rose-500">*</span></label>
-                            <input type="text" wire:model="tempat_lahir" @disabled($isDisabled)
+                            <input type="text" wire:model="tempat_lahir" @disabled($isDisabled) placeholder="Jawa Timur, Sidoarjo, Krian"
                                 class="bg-slate-50 border border-slate-200 text-slate-900 text-sm font-bold rounded-2xl focus:ring-4 focus:ring-blue-50 block w-full p-4 outline-none disabled:opacity-70">
                             @error('tempat_lahir') <span class="text-[10px] text-red-500 font-bold mt-1 uppercase">{{ $message }}</span> @enderror
                         </div>
