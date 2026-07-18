@@ -144,7 +144,7 @@
                                             </div>
                                         @endif
 
-                                        @can('master-pendaftaran.create.self')
+                                        @if(auth()->user()->can('master-pendaftaran.create') || auth()->user()->can('master-pendaftaran.create.self'))
                                             @if($user->isProfileComplete())
                                                 <button
                                                     wire:click="closeCreateModal"

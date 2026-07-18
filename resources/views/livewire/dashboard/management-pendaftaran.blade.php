@@ -380,6 +380,15 @@ new class extends Component {
         if (!auth()->user()->can('master-pendaftaran.create') && !auth()->user()->can('master-pendaftaran.create.self')) {
             abort(403);
         }
+
+        if (!auth()->user()->isProfileComplete()) {
+            $this->dispatch('notification', [
+                'status' => 'error',
+                'message' => 'Anda harus melengkapi data profil terlebih dahulu sebelum mendaftar.',
+            ]);
+            return;
+        }
+
         $this->create_payment_method = auth()->user()->can('master-pendaftaran.pay.cash') ? 'cash' : 'transfer';
         $this->create_payment_proof = null;
         $this->create_status = 'pending';
@@ -805,7 +814,7 @@ new class extends Component {
                 Persetujuan Peserta Lomba</p>
         </div>
 
-        @if(auth()->user()->can('master-pendaftaran.create') || (auth()->user()->can('master-pendaftaran.create.self') && auth()->user()->isProfileComplete()))
+        @if((auth()->user()->can('master-pendaftaran.create') || auth()->user()->can('master-pendaftaran.create.self')) && auth()->user()->isProfileComplete())
             <button wire:click="openCreateModal"
                 class="flex items-center gap-3 bg-ksc-blue hover:bg-blue-700 text-white px-8 py-4 rounded-2xl font-black transition shadow-xl shadow-blue-100 transform hover:-translate-y-1 uppercase text-xs tracking-widest group relative overflow-hidden">
                 <div
@@ -816,7 +825,7 @@ new class extends Component {
                     {{ auth()->user()->can('master-pendaftaran.create') ? 'Pendaftaran Manual' : 'Daftar Event Sekarang' }}
                 </span>
             </button>
-        @elseif(auth()->user()->can('master-pendaftaran.create.self') && !auth()->user()->isProfileComplete())
+        @elseif((auth()->user()->can('master-pendaftaran.create') || auth()->user()->can('master-pendaftaran.create.self')) && !auth()->user()->isProfileComplete())
             <div class="flex flex-col items-end gap-2">
                 <a href="{{ route('dashboard.my-profile') }}"
                     class="flex items-center gap-3 bg-rose-600 hover:bg-rose-700 text-white px-8 py-4 rounded-2xl font-black transition shadow-xl shadow-rose-100 transform hover:-translate-y-1 uppercase text-xs tracking-widest group">
