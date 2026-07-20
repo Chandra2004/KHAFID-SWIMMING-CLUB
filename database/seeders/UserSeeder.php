@@ -119,6 +119,7 @@ class UserSeeder extends Seeder
     /**
      * Helper to create a basic profile
      */
+    
     private function createProfile($user, $name, $gender = 'male', $clubUid = null, $birthDate = '2015-01-01')
     {
         DataUser::updateOrCreate(
