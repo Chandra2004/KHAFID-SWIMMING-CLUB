@@ -15,17 +15,17 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         // Get first club or create a default one to associate
-        $club = \App\Models\Club::first();
-        if (!$club) {
-            $club = \App\Models\Club::create([
-                'uid' => (string) \Illuminate\Support\Str::uuid(),
-                'name' => 'Khafid Swimming Club',
-                'short_name' => 'KSC',
-                'coach_name' => 'Coach Khafid',
-                'contact' => '085745000468',
-                'address' => 'Sidoarjo',
-            ]);
-        }
+        // $club = \App\Models\Club::first();
+        // if (!$club) {
+        //     $club = \App\Models\Club::create([
+        //         'uid' => (string) \Illuminate\Support\Str::uuid(),
+        //         'name' => 'Khafid Swimming Club',
+        //         'short_name' => 'KSC',
+        //         'coach_name' => 'Coach Khafid',
+        //         'contact' => '085745000468',
+        //         'address' => 'Sidoarjo',
+        //     ]);
+        // }
 
         // 1. Create Superadmin
         $superadmin = User::updateOrCreate(
@@ -40,40 +40,40 @@ class UserSeeder extends Seeder
         $this->createProfile($superadmin, 'Super Admin', 'male', $club->uid);
 
         // 2. Create Admin
-        $admin = User::updateOrCreate(
-            ['email' => 'admin@khafid.com'],
-            [
-                'username' => 'admin',
-                'password' => Hash::make('admin28092004'),
-                'is_active' => true,
-            ]
-        );
-        $admin->assignRole('admin');
-        $this->createProfile($admin, 'Admin Official', 'male', $club->uid);
+        // $admin = User::updateOrCreate(
+        //     ['email' => 'admin@khafid.com'],
+        //     [
+        //         'username' => 'admin',
+        //         'password' => Hash::make('admin28092004'),
+        //         'is_active' => true,
+        //     ]
+        // );
+        // $admin->assignRole('admin');
+        // $this->createProfile($admin, 'Admin Official', 'male', $club->uid);
 
         // 3. Create Pelatih
-        $coach = User::updateOrCreate(
-            ['email' => 'pelatih@khafid.com'],
-            [
-                'username' => 'pelatih',
-                'password' => Hash::make('pelatih28092004'),
-                'is_active' => true,
-            ]
-        );
-        $coach->assignRole('pelatih');
-        $this->createProfile($coach, 'Coach Khafid', 'male', $club->uid);
+        // $coach = User::updateOrCreate(
+        //     ['email' => 'pelatih@khafid.com'],
+        //     [
+        //         'username' => 'pelatih',
+        //         'password' => Hash::make('pelatih28092004'),
+        //         'is_active' => true,
+        //     ]
+        // );
+        // $coach->assignRole('pelatih');
+        // $this->createProfile($coach, 'Coach Khafid', 'male', $club->uid);
 
         // 4. Create Atlet
-        $athlete = User::updateOrCreate(
-            ['email' => 'atlet@khafid.com'],
-            [
-                'username' => 'atlet',
-                'password' => Hash::make('atlet28092004'),
-                'is_active' => true,
-            ]
-        );
-        $athlete->assignRole('atlet');
-        $this->createProfile($athlete, 'Atlet Utama KSC', 'male', $club->uid, '2015-06-15');
+        // $athlete = User::updateOrCreate(
+        //     ['email' => 'atlet@khafid.com'],
+        //     [
+        //         'username' => 'atlet',
+        //         'password' => Hash::make('atlet28092004'),
+        //         'is_active' => true,
+        //     ]
+        // );
+        // $athlete->assignRole('atlet');
+        // $this->createProfile($athlete, 'Atlet Utama KSC', 'male', $club->uid, '2015-06-15');
 
         // 5. Create Sample Athletes (Birth year 2015)
         // $clubs = \App\Models\Club::all();
@@ -119,28 +119,28 @@ class UserSeeder extends Seeder
     /**
      * Helper to create a basic profile
      */
-    private function createProfile($user, $name, $gender = 'male', $clubUid = null, $birthDate = '2015-01-01')
-    {
-        DataUser::updateOrCreate(
-            ['user_uid' => $user->uid],
-            [
-                'uid' => (string) \Illuminate\Support\Str::uuid(),
-                'full_name' => $name,
-                'nickname' => strtolower(explode(' ', $name)[0]),
-                'gender' => $gender,
-                'birth_place' => 'Sidoarjo',
-                'birth_date' => $birthDate,
-                'phone_number' => '081234567890',
-                'backup_phone_number' => '089876543210',
-                'address' => 'Jl. Raya Swimming Club No. 28, Sidoarjo',
-                'height' => 150,
-                'weight' => 45,
-                'identity_number' => '3515012345678901',
-                'medical_history' => 'Tidak ada',
-                'club_uid' => $clubUid,
-                'is_active' => true,
-                'joined_at' => now(),
-            ]
-        );
-    }
+    // private function createProfile($user, $name, $gender = 'male', $clubUid = null, $birthDate = '2015-01-01')
+    // {
+    //     DataUser::updateOrCreate(
+    //         ['user_uid' => $user->uid],
+    //         [
+    //             'uid' => (string) \Illuminate\Support\Str::uuid(),
+    //             'full_name' => $name,
+    //             'nickname' => strtolower(explode(' ', $name)[0]),
+    //             'gender' => $gender,
+    //             'birth_place' => 'Sidoarjo',
+    //             'birth_date' => $birthDate,
+    //             'phone_number' => '081234567890',
+    //             'backup_phone_number' => '089876543210',
+    //             'address' => 'Jl. Raya Swimming Club No. 28, Sidoarjo',
+    //             'height' => 150,
+    //             'weight' => 45,
+    //             'identity_number' => '3515012345678901',
+    //             'medical_history' => 'Tidak ada',
+    //             'club_uid' => $clubUid,
+    //             'is_active' => true,
+    //             'joined_at' => now(),
+    //         ]
+    //     );
+    // }
 }
